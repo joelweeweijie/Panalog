@@ -1,0 +1,52 @@
+{% extends "Home\base.html" %}
+{% block content %}
+
+    <h1>Ticket Detail Page</h1>
+
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  width: 100px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+
+<table>
+  <tr>
+    <th>TicketID</th>
+    <th>Assignee</th>
+    <th>Mandays</th>
+      <th>Description</th>
+      <th>Date Created</th>
+  </tr>
+  <tr>
+    <td>{{object.ticketNo}}</td>
+     <td><a class="mr-2" href="{% url 'user-ticket' object.assigned %}">{{object.assigned}}</a></td>
+    <td>{{object.mandays}}</td>
+      <td>{{object.description}}</td>
+      <td>{{object.date_created}}</td>
+  </tr>
+</table>
+{% if object.assigned == user.username %}
+<div>
+   <a class="btn btn-outline-secondary btn-sm mt-1 mb-1" href="{% url 'ticket-update' object.id %}">Update</a>
+  <a class="btn btn-outline-danger btn-sm mt-1 mb-1" href="{% url 'ticket-delete' object.id %}">Delete</a>
+</div>
+
+{% endif %}
+
+
+{% endblock content %}
+</tbody>
+</table>

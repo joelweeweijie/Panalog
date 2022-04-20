@@ -1,0 +1,66 @@
+{% extends "Home\base.html" %}
+{% block content %}
+
+    <h1>Panalog Home with base template!</h1>
+
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  width: 100px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+
+<table>
+  <tr>
+    <th>TicketID</th>
+    <th>Assignee</th>
+    <th>Mandays</th>
+    <th>Description</th>
+    <th>Date Created</th>
+    <th>Manage</th>
+  </tr>
+{% for q in tix %}
+  <tr>
+    <td>{{q.ticketNo}}</td>
+    <td><a class="mr-2" href="{% url 'user-ticket' q.assigned %}">{{q.assigned}}</a></td>
+    <td>{{q.mandays}}</td>
+    <td>{{q.description}}</td>
+    <td>{{q.date_created}}</td>
+    <!--<td style="padding:10px;"><a href="{% url 'ticket-detail' q.id %}">Edit</a></td>-->
+    <td><a href="{% url 'ticket-update' q.id %}">Update</a></td>
+  </tr>
+{% endfor %}
+</table>
+
+{% if is_paginated %}
+  {% if page_obj.has_previous %}
+    <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+    <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number}}">Previous</a>
+  {% endif %}
+  {% for num in page_obj.paginator.page_range %}
+    {% if page_obj.numer == num %}
+    <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+    {% elif num > page_obj.number|add:'-3' and page_obj.number|add:'3' %}
+    <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+    {% endif %}
+  {% endfor %}
+
+{% if page_obj.has_next %}
+    <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number}}">Next</a>
+    <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.num_pages }}">Last</a>
+  {% endif %}
+
+{% endif %}
+{% endblock content %}

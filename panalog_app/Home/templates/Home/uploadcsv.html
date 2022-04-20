@@ -1,0 +1,55 @@
+{% extends "Home\base.html" %}
+{% block content %}
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  width: 100px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+<table>
+  <tr>
+    <th>TicketID</th>
+    <th>Assignee</th>
+      <th>Description</th>
+      <th>Date Created</th>
+  </tr>
+{% for q in tix %}
+  <tr>
+    <td>{{q.ticketNo}}</td>
+    <td>{{q.assigned}}</td>
+      <td>{{q.description}}</td>
+      <td>{{q.date_created}}</td>
+  </tr>
+{% endfor %}
+</table>
+    {% for message in messages %}
+    <div>
+        <strong>{{message|safe}}</strong>
+    </div>
+    {% endfor %}
+    <h1>Upload CSV to Database</h1>
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>Order of CSV should be </p>
+        <br>
+        <label for="file1"> Upload a file</label>
+        <small>Only accepts CSV files</small>
+        <input class="form-control" type="file" id="file1" name="file">
+        <br>
+
+        <button type="submit" class="btn btn-outline-primary">Upload</button>
+    </form>
+{% endblock content %}

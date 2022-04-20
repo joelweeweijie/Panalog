@@ -1,0 +1,88 @@
+{% extends "Home\base.html" %}
+{% block content %}
+
+    <h1>Hall of Non Loggers</h1>
+
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  width: 100px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>No. not logged</th>
+  </tr>
+{% for q in tix %}
+  <tr>
+    <td>{{q.assigned}}</td>
+    <td>{{q.c1}}</td>
+  </tr>
+{% endfor %}
+</table>
+
+
+{% if is_paginated %}
+  {% if page_obj.has_previous %}
+    <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+    <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number}}">Previous</a>
+  {% endif %}
+  {% for num in page_obj.paginator.page_range %}
+    {% if page_obj.numer == num %}
+    <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+    {% elif num > page_obj.number|add:'-3' and page_obj.number|add:'3' %}
+    <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+    {% endif %}
+  {% endfor %}
+
+{% if page_obj.has_next %}
+    <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number}}">Next</a>
+    <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.num_pages }}">Last</a>
+  {% endif %}
+
+{% endif %}
+
+  <p>Emails: {% for a in email %}{{ a.user.email }}; {% endfor %}</p>
+
+<!--
+<div class="container">
+  {% for q in tix %}
+  <div class="row row-cols-2">
+    <div class="col">{{q.assigned}}</div>
+    <div class="col">{{q.c1}}</div>
+    <div class="col"></div>
+  </div>
+  {% endfor %}
+</div>
+
+-->
+
+
+
+<div class="container">
+  <div class="row row-cols-2">
+  <h3>Only Existing Members with Non Log Ticekts named here !</h3>
+  </div>
+  {% for i in ticketandmember %}
+  <div class="row row-cols-2">
+    <div class="col"></div>
+    <div class="col"> {{i.username}}</div>
+    <div class="col"></div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %}

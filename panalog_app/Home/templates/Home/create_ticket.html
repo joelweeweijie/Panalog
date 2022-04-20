@@ -1,0 +1,22 @@
+{% extends "Home\base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>Create Ticket</h1>
+    <div class="content-section">
+        {% if submitted %}
+            <legend class="border-bottom mb-4">Ticket Created</legend>
+        {% else %}
+        <form method="post">
+            {% csrf_token %}
+            <fieldset class="form-group2">
+                {{ form.as_p }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Create</button>
+            </div>
+        </form>
+        {% endif%}
+    </div>
+
+    </div>
+{% endblock content %}
