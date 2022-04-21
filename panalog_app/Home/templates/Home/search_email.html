@@ -1,0 +1,12 @@
+{% extends "Home\base.html" %}
+{% block content %}
+    <h1>Search for Email</h1>
+    {% if searched %}
+    <p>{{ searched }}</p>
+    {% endif %}
+    <br/>
+    {% for p in result %}
+        <p>{{ p.username }} - {{ p.email }}</p>
+    {% endfor %}
+
+{% endblock content %}

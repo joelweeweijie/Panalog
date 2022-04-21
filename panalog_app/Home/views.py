@@ -91,18 +91,8 @@ def createticket(request):
 
 def about(request):
 
-    #current_user = request.user.username
-
-    q1 = Profile.objects.filter()
-    print(q1.values('user'))
-    #ticket = Ticket.objects.filter(assigned=current_user)
-    #print(" $$$$$$$$$$$$$$$$$$$",ticket)
-
     user = User.objects.get(id=4)
     print("USER", user.__dict__)
-
-
-
 
     context = {
         'title': 'About',
@@ -152,18 +142,13 @@ def export(request):
 
 def hallnonlogger(request):
 
-    #q1 = Profile.objects.all()
-    #print(q1)
-    #print(q1[0].team)
-
-    #print(Ticket.objects.values("assigned").filter(mandays="0").annotate(c1=Count("id")).order_by("c1"))
     nonlog = Ticket.objects.values("assigned").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
     #print(nonlog)
     #print("index 0: ",nonlog[0])
 
     #mydata = Ticket.objects.filter(mandays="0").values("assigned").annotate(Count('id', distinct=True))
     mydata = Ticket.objects.all().filter(mandays="0").values("assigned")
-    print("Printing 0 Manday ticket people", mydata)
+    #print("Printing 0 Manday ticket people", mydata)
 
     #to_find = "Joel"
 
@@ -171,17 +156,41 @@ def hallnonlogger(request):
     #    if nonlog[s]["assigned"] == to_find:
     #        print("{} no. of nonlog  is {} from module.".format(nonlog[s]["assigned"], nonlog[s]["c1"]))
     #        print()
-    print("+++++++++++++++++++++")
+    #print("+++++++++++++++++++++")
     non = Profile.objects.all()
 
     t1 = User.objects.all().values("username")
-    print("Printing User Object ", t1)
-    print("#################################")
+    #print("Printing User Object ", t1)
+    #print("#################################")
     qs1 = t1.intersection(mydata)
-    print(qs1)
+    qs1_list = list(qs1)
+    print("GGGGGGGGGGGGGGGG")
+    print(qs1_list)
+    print("HHHHHHHHHHHHHH")
+    qs2_list = ''.join([str(x) for x in qs1_list])
+    print(''.join([str(x) for x in qs1_list]))
+    print("JJJJJJJJJJJJJJJJJJJ")
+
+    #print(" ".join(qs1_list))
+    my_string = qs2_list
+    remove = ['username']
+    for value in remove:
+        my_string = my_string.replace(value, '')
+    print(my_string)
+
+    punctuation = '''!/?@#$%^&*_~()-[]{};:'"\,<>.'''
+    my_string2 = my_string
+    remove_punct = ""
+    for character in my_string2:
+        if character not in punctuation:
+            remove_punct = remove_punct + character
+    print(remove_punct)
+
     #for nonloger in non:
     #    print(nonloger.user.email)
 
+    #for i in qs1_list
+     #   list
 
 
     context = {
@@ -192,3 +201,24 @@ def hallnonlogger(request):
 
     }
     return render(request, 'Home/nonlogger.html', context)
+
+def search(request):
+    if request.method == "POST":
+        searched = request.POST['searched']
+        results = User.objects.filter(username__contains=searched)
+        print(results)
+    context = {
+        'title': 'Search Email',
+        'searched': searched,
+        'result': results,
+    }
+    return render(request, 'Home/search_email.html', context)
+
+def team(request):
+    user1 = User.objects.filter(is_staff=False)
+
+    context = {
+        'title': 'Module Team',
+        'user': user1,
+    }
+    return render(request, 'Home/team.html', context)

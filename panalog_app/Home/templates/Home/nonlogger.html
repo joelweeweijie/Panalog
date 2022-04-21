@@ -2,7 +2,16 @@
 {% block content %}
 
     <h1>Hall of Non Loggers</h1>
-
+<script>
+  $(document).on("click", ".open-incident", function (e) {
+    e.preventDefault();
+    var $popup = $("#popup");
+    var popup_url = $(this).data("popup-url");
+    $(".modal-body", $popup).load(popup_url, function () {
+      $popup.modal("show");
+    });
+  });
+</script>
 <style>
 table {
   font-family: arial, sans-serif;
@@ -24,11 +33,13 @@ tr:nth-child(even) {
 
 <table>
   <tr>
+    <th>Number</th>
     <th>Name</th>
     <th>No. not logged</th>
   </tr>
 {% for q in tix %}
   <tr>
+    <td>{{ forloop.counter }}</td>
     <td>{{q.assigned}}</td>
     <td>{{q.c1}}</td>
   </tr>
@@ -56,7 +67,15 @@ tr:nth-child(even) {
 
 {% endif %}
 
-  <p>Emails: {% for a in email %}{{ a.user.email }}; {% endfor %}</p>
+  <p>Emails: {% for a in email %} {{ a.user.email }}; {% endfor %}</p>
+
+  <form method="post" action="{% url 'email-search' %}">
+    {% csrf_token %}
+
+    <input type="search" placeholder="Search Email" aria-label="Search Email" name="searched">
+    <button class="btn btn-outline-secondary" type="submit">Search</button>
+  </form>
+
 
 <!--
 <div class="container">
@@ -79,10 +98,17 @@ tr:nth-child(even) {
   </div>
   {% for i in ticketandmember %}
   <div class="row row-cols-2">
-    <div class="col"></div>
-    <div class="col"> {{i.username}}</div>
+    <div class="col">{{i.username}}</div>
+    <div class="col"> </div>
     <div class="col"></div>
   </div>
   {% endfor %}
 </div>
+
+{% if user.is_authenticated %}
+        <p>authenticated</p>
+      {% else %}
+        <p>NOT authenticated</p>
+      {% endif %}
+
 {% endblock content %}
