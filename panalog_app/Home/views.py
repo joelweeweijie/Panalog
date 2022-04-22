@@ -222,3 +222,17 @@ def team(request):
         'user': user1,
     }
     return render(request, 'Home/team.html', context)
+
+def month(request):
+     #= Ticket.objects.get()  # use filter() when you have sth to filter ;)
+    item = Ticket.objects.all()
+    #print("Ticket stuff +++++++", item.__dict__)
+    #print(item)
+    #print("Ticket stuff : ", item)
+    result1 = Ticket.objects.filter(date_created__year__gte=2022,date_created__month__gte=4,date_created__year__lte=2022,date_created__month__lte=4)
+
+    context = {
+        'title': 'Active Month',
+        'months': result1,
+    }
+    return render(request, 'Home/activemonth.html', context)

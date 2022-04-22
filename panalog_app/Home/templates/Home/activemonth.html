@@ -1,0 +1,26 @@
+{% extends "Home\base.html" %}
+{% block content %}
+    <h1>Active Month</h1>
+
+<form method="POST">
+<select name="item_id">
+{% for entry in months %}
+    <option value="{{ entry.id }}">{{ entry.date_created|date:"M,Y" }}</option>
+{% endfor %}
+</select>
+</form>
+
+<div class="container">
+  <div class="row row-cols-2">
+  <h3>Months Here!</h3>
+  </div>
+  {% for i in months %}
+  <div class="row row-cols-2">
+    <div class="col">{{i.}}</div>
+    <div class="col"> </div>
+    <div class="col"></div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock content %}
