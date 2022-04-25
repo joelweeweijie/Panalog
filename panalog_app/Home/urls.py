@@ -12,11 +12,11 @@ urlpatterns = [
     path('post/<int:pk>/update/', PostUpdateView.as_view(), name='ticket-update'),
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='ticket-delete'),
     path('about/', views.about, name='Pana-about'),
-    path('team/', views.team, name='Pana-team'),
     path('search/', views.search, name='email-search'),
     path('hall/', views.hallnonlogger, name='Pana-hall'),
     path('uploadcsv/', views.uploadcsv, name='Pana-uploadcsv'),
     path('export/', views.export, name='Pana-export'),
     path('actmth/', views.month, name='Pana-actmonth'),
+    path('allmem/', views.allmember, name='Pana-allmem'),
 
 ]

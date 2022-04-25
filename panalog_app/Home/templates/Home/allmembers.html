@@ -1,0 +1,20 @@
+{% extends "Home\base.html" %}
+{% block content %}
+    <h1>All Members</h1>
+
+{% for q in result %}
+  <div class="row row-cols-2">
+            <div class="col">{{q.profile.team}}</div>
+            <div class="col">{{q.username}}</div>
+            <div class="col">{{q.email}}</div>
+            <div class="col"></div>
+          </div>
+{% endfor %}
+
+{% if user.is_authenticated %}
+        <p>authenticated</p>
+      {% else %}
+        <p>NOT authenticated</p>
+      {% endif %}
+
+{% endblock content %}

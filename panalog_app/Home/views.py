@@ -214,15 +214,6 @@ def search(request):
     }
     return render(request, 'Home/search_email.html', context)
 
-def team(request):
-    user1 = User.objects.filter(is_staff=False)
-
-    context = {
-        'title': 'Module Team',
-        'user': user1,
-    }
-    return render(request, 'Home/team.html', context)
-
 def month(request):
      #= Ticket.objects.get()  # use filter() when you have sth to filter ;)
     item = Ticket.objects.all()
@@ -236,3 +227,15 @@ def month(request):
         'months': result1,
     }
     return render(request, 'Home/activemonth.html', context)
+
+
+def allmember(request):
+
+    result1 = User.objects.filter(is_staff=False)
+
+    context = {
+        'title': 'All Members',
+        'result': result1,
+    }
+    return render(request, 'Home/allmembers.html', context)
+
