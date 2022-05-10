@@ -1,26 +1,63 @@
 {% extends "Home\base.html" %}
 {% block content %}
-    <h1>Active Month</h1>
 
-<form method="POST">
-<select name="item_id">
-{% for entry in months %}
-    <option value="{{ entry.id }}">{{ entry.date_created|date:"M,Y" }}</option>
-{% endfor %}
-</select>
+    <h2>Active Month</h2>
+    <h3>{{ active }}</h3>
+
+<form action="" method="post">
+    {% csrf_token %}
+    Release month :
+    <select name="letter">
+        <option value="01">January</option>
+        <option value="02">February</option>
+        <option value="03">March</option>
+        <option value="04">April</option>
+        <option value="05">May</option>
+        <option value="06">June</option>
+        <option value="07">July</option>
+        <option value="08">August</option>
+        <option value="09">September</option>
+        <option value="10">October</option>
+        <option value="11">Novmeber</option>
+        <option value="12">December</option>
+    </select>
+    <select name="year">
+        <option value="2020">2020</option>
+        <option value="2021">2021</option>
+        <option value="2022">2022</option>
+        <option value="2023">2023</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+    </select>
+<input type="submit" value="Submit">
+<br>
+
 </form>
 
-<div class="container">
-  <div class="row row-cols-2">
-  <h3>Months Here!</h3>
-  </div>
-  {% for i in months %}
-  <div class="row row-cols-2">
-    <div class="col">{{i.}}</div>
-    <div class="col"> </div>
-    <div class="col"></div>
-  </div>
-  {% endfor %}
+<div>
+<table>
+  <tr>
+    <th>TicketID</th>
+    <th>Assignee</th>
+    <th>Mandays</th>
+    <th>Description</th>
+    <th>Date Created</th>
+    <th>Manage</th>
+  </tr>
+{% for q in result %}
+  <tr>
+    <td>{{q.ticketNo}}</td>
+    <td><a class="mr-2" href="{% url 'user-ticket' q.assigned %}">{{q.assigned}}</a></td>
+    <td>{{q.mandays}}</td>
+    <td>{{q.description}}</td>
+    <td>{{q.date_created}}</td>
+    <!--<td style="padding:10px;"><a href="{% url 'ticket-detail' q.id %}">Edit</a></td>-->
+    <td><a href="{% url 'ticket-update' q.id %}">Update</a></td>
+  </tr>
+{% endfor %}
+</table>
 </div>
+
+
 
 {% endblock content %}

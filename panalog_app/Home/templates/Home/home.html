@@ -2,6 +2,7 @@
 {% block content %}
 
     <h1>Panalog Home with base template!</h1>
+  <h3>Active Month {{ tix.0.date_created|date:"M, Y"  }}</h3>
 
 <style>
 table {
@@ -34,7 +35,8 @@ tr:nth-child(even) {
 {% for q in tix %}
   <tr>
     <td>{{q.ticketNo}}</td>
-    <td><a class="mr-2" href="{% url 'user-ticket' q.assigned %}">{{q.assigned}}</a></td>
+    <!--<td><a class="mr-2" href="{% url 'user-ticket' q.assigned %}">{{q.assigned}}</a></td>-->
+    <td>{{q.assigned}}</td>
     <td>{{q.mandays}}</td>
     <td>{{q.description}}</td>
     <td>{{q.date_created}}</td>

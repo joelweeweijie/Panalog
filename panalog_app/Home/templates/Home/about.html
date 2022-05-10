@@ -4,4 +4,8 @@
 
 <p>Welcome to the about page here you will find out how to use the Web Portal</p>
 
+{% for q in result %}
+{{ q.email }}
+{% endfor %}
+
 {% endblock content %}

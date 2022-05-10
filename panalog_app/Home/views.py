@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -10,6 +11,8 @@ from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from .forms import ticketform
+from .decorator import member_only, manager_only
+import json
 
 
 # Create your views here.
@@ -17,21 +20,19 @@ from .forms import ticketform
 
 def home(request):
     context = {
-        'tix':Ticket.objects.all(),
+        'month':Ticket.objects.filter(classt="Active"),
         'title': 'Home'
 
     }
 
     return render(request, 'Home/home.html', context)
 
-class PostListView(ListView):
-
+class PostListView(LoginRequiredMixin, ListView):
     model = Ticket
     template_name = 'Home/home.html'
     context_object_name = 'tix'
     def get_queryset(self):
-        return Ticket.objects.filter(assigned=self.request.user).order_by('-date_created')
-    #oder tickets based on date created "-" means newest first
+        return Ticket.objects.filter(classt="Active").filter(assigned=self.request.user.first_name).order_by('-date_created')
     ordering = ['-date_created']
     paginate_by = 5
 
@@ -75,6 +76,7 @@ def createticket(request):
         if form.is_valid():
             q1 = form.save(commit=False)
             q1.assigned = request.user.username
+            q1.classt = "Active"
             q1.save()
             return HttpResponseRedirect('/create?submitted=True')
     else:
@@ -90,15 +92,19 @@ def createticket(request):
     return render(request, 'Home/create_ticket.html', context)
 
 def about(request):
+    #user = User.objects.get(id=4)
+    #print("USER", user.__dict__)
 
-    user = User.objects.get(id=4)
-    print("USER", user.__dict__)
+    #print(request.user.get_full_name())
 
     context = {
         'title': 'About',
     }
     return render(request, 'Home/about.html', context)
 
+
+@login_required
+@manager_only
 def uploadcsv(request):
     context = {
         'tix':Ticket.objects.all(),
@@ -126,8 +132,10 @@ def uploadcsv(request):
         messages.success(request, 'Successfully uploaded')
     return render(request, 'Home/uploadcsv.html', context)
 
+@login_required
+@manager_only
 def export(request):
-    #this will export the current Entire Ticket table into a csv
+
     response = HttpResponse(content_type='text/csv')
 
     writer = csv.writer(response)
@@ -142,12 +150,12 @@ def export(request):
 
 def hallnonlogger(request):
 
-    nonlog = Ticket.objects.values("assigned").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
+    nonlog = Ticket.objects.values("assigned").filter(classt="Active").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
     #print(nonlog)
     #print("index 0: ",nonlog[0])
 
     #mydata = Ticket.objects.filter(mandays="0").values("assigned").annotate(Count('id', distinct=True))
-    mydata = Ticket.objects.all().filter(mandays="0").values("assigned")
+    mydata = Ticket.objects.all().filter(classt="Active").filter(mandays="0").values("assigned")
     #print("Printing 0 Manday ticket people", mydata)
 
     #to_find = "Joel"
@@ -162,21 +170,37 @@ def hallnonlogger(request):
     t1 = User.objects.all().values("username")
     #print("Printing User Object ", t1)
     #print("#################################")
+    #Get Registered Users and Intersection with Active Tickets to show (Registered & has Tickets)
+    #Tickets will have users who are not in PANALOG aka. randomly made tickets but assigned in AP
     qs1 = t1.intersection(mydata)
+
     qs1_list = list(qs1)
     print("GGGGGGGGGGGGGGGG")
-    print(qs1_list)
-    print("HHHHHHHHHHHHHH")
-    qs2_list = ''.join([str(x) for x in qs1_list])
-    print(''.join([str(x) for x in qs1_list]))
-    print("JJJJJJJJJJJJJJJJJJJ")
+    print(qs1)
+    string = ",".join([item['username'] for item in qs1_list])
+    #print("======Names of People who Registered and have Tickets=======")
+    #print(string)
+    result1 = ""
+    s = []
+    for i in range(len(qs1_list)):
+        s.append(qs1_list[i]['username'])
+    result1 = '","'.join(s)
+    result1 = '"' + result1 + '"'
+    print("+++++++++++++++++")
+    print("result1 = "+result1)
 
+
+    qs2_list = ''.join([str(x) for x in qs1_list])
+
+    #print(''.join([str(x) for x in qs1_list]))
+    #print("JJJJJJJJJJJJJJJJJJJ")
+    #print(qs2_list)
     #print(" ".join(qs1_list))
     my_string = qs2_list
     remove = ['username']
     for value in remove:
         my_string = my_string.replace(value, '')
-    print(my_string)
+    #print(my_string)
 
     punctuation = '''!/?@#$%^&*_~()-[]{};:'"\,<>.'''
     my_string2 = my_string
@@ -184,7 +208,7 @@ def hallnonlogger(request):
     for character in my_string2:
         if character not in punctuation:
             remove_punct = remove_punct + character
-    print(remove_punct)
+    #print(remove_punct)
 
     #for nonloger in non:
     #    print(nonloger.user.email)
@@ -192,12 +216,22 @@ def hallnonlogger(request):
     #for i in qs1_list
      #   list
 
+    #output = User.objects.filter(username__in=["Jack","Joel"])
+    #filter_dict = {'username__in':["Jack","Joel"]}
+    #output = User.objects.filter(**{username: result1})
+    #qs = User.objects.filter(**{search_field: result1})
+    qs = User.objects.filter(username__in=["Jack","Joel"])
+    #output = User.objects.filter(username__in=[result1])
+    #print(output)
+    print(qs)
+
 
     context = {
         'tix': nonlog,
         'title': 'hall',
         'email': non,
-        'ticketandmember' : qs1
+        'ticketandmember' : qs1,
+        'test': qs,
 
     }
     return render(request, 'Home/nonlogger.html', context)
@@ -214,25 +248,40 @@ def search(request):
     }
     return render(request, 'Home/search_email.html', context)
 
+@login_required
+@manager_only
 def month(request):
-     #= Ticket.objects.get()  # use filter() when you have sth to filter ;)
-    item = Ticket.objects.all()
-    #print("Ticket stuff +++++++", item.__dict__)
-    #print(item)
-    #print("Ticket stuff : ", item)
-    result1 = Ticket.objects.filter(date_created__year__gte=2022,date_created__month__gte=4,date_created__year__lte=2022,date_created__month__lte=4)
+
+    var2 = ""
+    var3 = ""
+    result1 = ""
+
+    if request.method == 'POST':
+        var2 = request.POST.get("letter", False)
+        var3 = request.POST.get("year", False)
+        print(var2, var3)
+
+        result1 = Ticket.objects.filter(date_created__year__gte=var3, date_created__month__gte=var2,
+                                     date_created__year__lte=var3, date_created__month__lte=var2)
+
+        Ticket.objects.filter(classt="Active").update(classt="Inactive")
+
+        Ticket.objects.filter(date_created__year__gte=var3, date_created__month__gte=var2,
+                              date_created__year__lte=var3, date_created__month__lte=var2).update(classt="Active")
+
+    active = var2 + " " + var3
 
     context = {
         'title': 'Active Month',
-        'months': result1,
+        'result': result1,
+        'active': active,
+
     }
     return render(request, 'Home/activemonth.html', context)
 
 
 def allmember(request):
-
     result1 = User.objects.filter(is_staff=False)
-
     context = {
         'title': 'All Members',
         'result': result1,

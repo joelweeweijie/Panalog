@@ -3,7 +3,7 @@ from django.urls import reverse
 from users.models import User
 
 # Create your models here.
-
+# Mandays  models.DecimalField(null=True, blank=True, default='0', max_digits=5, decimal_places=2)
 class Ticket(models.Model):
     ticketNo = models.CharField(max_length=20) #200-238541
     type = models.CharField(null=True, blank=True, max_length=25) # change request

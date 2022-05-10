@@ -2,14 +2,20 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 
 # Create your views here.
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            user.save()
+
             username = form.cleaned_data.get('username')
+            group = Group.objects.get(name='member')
+            user.groups.add(group)
+
             messages.success(request, f'Account Created, Login Now!')
             return redirect('login')
     else:

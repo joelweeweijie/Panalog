@@ -2,16 +2,7 @@
 {% block content %}
 
     <h1>Hall of Non Loggers</h1>
-<script>
-  $(document).on("click", ".open-incident", function (e) {
-    e.preventDefault();
-    var $popup = $("#popup");
-    var popup_url = $(this).data("popup-url");
-    $(".modal-body", $popup).load(popup_url, function () {
-      $popup.modal("show");
-    });
-  });
-</script>
+
 <style>
 table {
   font-family: arial, sans-serif;
@@ -100,6 +91,13 @@ tr:nth-child(even) {
   <div class="row row-cols-2">
     <div class="col">{{i.username}}</div>
     <div class="col"> </div>
+    <div class="col"></div>
+  </div>
+  {% endfor %}
+  {% for x in test %}
+  <div class="row row-cols-2">
+    <div class="col">{{x.username}}</div>
+    <div class="col">{{x.email}}</div>
     <div class="col"></div>
   </div>
   {% endfor %}

@@ -28,15 +28,32 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="{% url 'Pana-about' %}">About</a>
+              <a class="nav-item nav-link" href="{% url 'Pana-about' %}">Abt</a>
                 <a class="nav-item nav-link" href="{% url 'Pana-allmem' %}">AllM</a>
                 <a class="nav-item nav-link" href="{% url 'Pana-hall' %}">NonLogger</a>
+                {% if user.is_authenticated %}
+                    {% for group in  request.user.groups.all %}
+                        {%  if 'manager' == group.name %}
+                <li class="nav-item dropdown">
+                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item" href="{% url 'Pana-uploadcsv' %}">Upload CSV</a>
+                                <div class="dropdown-divider"></div>
+                              <a class="dropdown-item" href="{% url 'Pana-actmonth' %}">Active Month</a>
+                              <div class="dropdown-divider"></div>
+                              <a class="dropdown-item" href="#">Separated link</a>
+                            </div>
+                </li>
+                        {% endif %}
+                    {% endfor %}
+              {% endif %}
             </div>
+
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
                 {% if user.is_authenticated %}
                 <a class="nav-item nav-link" href="{% url 'ticket-create' %}">NewTicket</a>
-                <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
+                <a class="nav-link font-italic" href="{% url 'profile' %}">Logged in as [{{user.username}}]</a>
                 <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
                 {% else %}
               <a class="nav-item nav-link" href="{% url 'login'%}">Login</a>

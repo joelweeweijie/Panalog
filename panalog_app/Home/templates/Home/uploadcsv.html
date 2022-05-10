@@ -44,6 +44,8 @@ tr:nth-child(even) {
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <p>Order of CSV should be </p>
+        {% load static %}
+        <img src="{% static '/csvformat.PNG' %}" alt="My image" width="550">
         <br>
         <label for="file1"> Upload a file</label>
         <small>Only accepts CSV files</small>
