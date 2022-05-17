@@ -151,87 +151,28 @@ def export(request):
 def hallnonlogger(request):
 
     nonlog = Ticket.objects.values("assigned").filter(classt="Active").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
-    #print(nonlog)
-    #print("index 0: ",nonlog[0])
 
-    #mydata = Ticket.objects.filter(mandays="0").values("assigned").annotate(Count('id', distinct=True))
-    mydata = Ticket.objects.all().filter(classt="Active").filter(mandays="0").values("assigned")
-    #print("Printing 0 Manday ticket people", mydata)
-
-    #to_find = "Joel"
-
-    #for s in range(len(nonlog)):
-    #    if nonlog[s]["assigned"] == to_find:
-    #        print("{} no. of nonlog  is {} from module.".format(nonlog[s]["assigned"], nonlog[s]["c1"]))
-    #        print()
-    #print("+++++++++++++++++++++")
     non = Profile.objects.all()
 
-    t1 = User.objects.all().values("username")
-    #print("Printing User Object ", t1)
-    #print("#################################")
-    #Get Registered Users and Intersection with Active Tickets to show (Registered & has Tickets)
-    #Tickets will have users who are not in PANALOG aka. randomly made tickets but assigned in AP
-    qs1 = t1.intersection(mydata)
+    #Get the Intersection of Existing Tickets and Existing Users, as there maybe tickets made from other department, or tickets assigned to non existing users.
+    trueTickets = Ticket.objects.all().filter(classt="Active").filter(mandays="0").values("assigned")
+    trueUsers = User.objects.all().values("username")
+    qs1 = trueUsers.intersection(trueTickets)
 
-    qs1_list = list(qs1)
-    print("GGGGGGGGGGGGGGGG")
-    print(qs1)
-    string = ",".join([item['username'] for item in qs1_list])
-    #print("======Names of People who Registered and have Tickets=======")
-    #print(string)
-    result1 = ""
-    s = []
-    for i in range(len(qs1_list)):
-        s.append(qs1_list[i]['username'])
-    result1 = '","'.join(s)
-    result1 = '"' + result1 + '"'
-    print("+++++++++++++++++")
-    print("result1 = "+result1)
+    #print("GGGGGGGGGGGGGGGG")
+    #print(qs1)
 
-
-    qs2_list = ''.join([str(x) for x in qs1_list])
-
-    #print(''.join([str(x) for x in qs1_list]))
-    #print("JJJJJJJJJJJJJJJJJJJ")
-    #print(qs2_list)
-    #print(" ".join(qs1_list))
-    my_string = qs2_list
-    remove = ['username']
-    for value in remove:
-        my_string = my_string.replace(value, '')
-    #print(my_string)
-
-    punctuation = '''!/?@#$%^&*_~()-[]{};:'"\,<>.'''
-    my_string2 = my_string
-    remove_punct = ""
-    for character in my_string2:
-        if character not in punctuation:
-            remove_punct = remove_punct + character
-    #print(remove_punct)
-
-    #for nonloger in non:
-    #    print(nonloger.user.email)
-
-    #for i in qs1_list
-     #   list
-
-    #output = User.objects.filter(username__in=["Jack","Joel"])
-    #filter_dict = {'username__in':["Jack","Joel"]}
-    #output = User.objects.filter(**{username: result1})
-    #qs = User.objects.filter(**{search_field: result1})
-    qs = User.objects.filter(username__in=["Jack","Joel"])
-    #output = User.objects.filter(username__in=[result1])
-    #print(output)
+    #qs = User.objects.filter(username__in=["Jack","Joel"])
+    qs = User.objects.filter(username__in=qs1)
+    print("Users")
     print(qs)
+    #print(qs)
 
 
     context = {
         'tix': nonlog,
         'title': 'hall',
-        'email': non,
-        'ticketandmember' : qs1,
-        'test': qs,
+        'trueTixnUser': qs,
 
     }
     return render(request, 'Home/nonlogger.html', context)

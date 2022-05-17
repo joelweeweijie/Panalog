@@ -3,6 +3,8 @@
 
     <h1>Hall of Non Loggers</h1>
 
+<h3>Active Month {{ tix.date_created|date:"M, Y"  }} NOW</h3>
+
 <style>
 table {
   font-family: arial, sans-serif;
@@ -24,13 +26,11 @@ tr:nth-child(even) {
 
 <table>
   <tr>
-    <th>Number</th>
     <th>Name</th>
     <th>No. not logged</th>
   </tr>
 {% for q in tix %}
   <tr>
-    <td>{{ forloop.counter }}</td>
     <td>{{q.assigned}}</td>
     <td>{{q.c1}}</td>
   </tr>
@@ -57,9 +57,7 @@ tr:nth-child(even) {
   {% endif %}
 
 {% endif %}
-
-  <p>Emails: {% for a in email %} {{ a.user.email }}; {% endfor %}</p>
-
+<br>
   <form method="post" action="{% url 'email-search' %}">
     {% csrf_token %}
 
@@ -68,39 +66,12 @@ tr:nth-child(even) {
   </form>
 
 
-<!--
-<div class="container">
-  {% for q in tix %}
-  <div class="row row-cols-2">
-    <div class="col">{{q.assigned}}</div>
-    <div class="col">{{q.c1}}</div>
-    <div class="col"></div>
-  </div>
-  {% endfor %}
-</div>
-
--->
-
-
-
 <div class="container">
   <div class="row row-cols-2">
   <h3>Only Existing Members with Non Log Ticekts named here !</h3>
   </div>
-  {% for i in ticketandmember %}
-  <div class="row row-cols-2">
-    <div class="col">{{i.username}}</div>
-    <div class="col"> </div>
-    <div class="col"></div>
-  </div>
-  {% endfor %}
-  {% for x in test %}
-  <div class="row row-cols-2">
-    <div class="col">{{x.username}}</div>
-    <div class="col">{{x.email}}</div>
-    <div class="col"></div>
-  </div>
-  {% endfor %}
+  <br>
+  <p>Emails: {% for a in trueTixnUser %} {{ a.email }}; {% endfor %}</p>
 </div>
 
 {% if user.is_authenticated %}

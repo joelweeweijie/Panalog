@@ -4,6 +4,8 @@
     <h2>Active Month</h2>
     <h3>{{ active }}</h3>
 
+<h3>Active Month {{ result.0.date_created|date:"M, Y"  }}</h3>
+
 <form action="" method="post">
     {% csrf_token %}
     Release month :
