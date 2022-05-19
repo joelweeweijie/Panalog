@@ -22,6 +22,7 @@ class Ticket(models.Model):
     requester = models.CharField(null=True, blank=True, max_length=255) # Chen, Wang
     reasoncode = models.CharField(max_length=50, null=True, blank=True) # Awaiting
     classt = models.CharField(null=True, blank=True,max_length=50) # SAP (NS)
+    flag = models.BooleanField(default=False)
 
     def __str__(self):
         return self.ticketNo

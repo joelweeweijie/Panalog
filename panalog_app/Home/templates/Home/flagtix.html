@@ -1,0 +1,23 @@
+{% extends "Home\base.html" %}
+{% block content %}
+    <h1>Flagged Tickets!</h1>
+
+<p>Flagged Tickets will Appear Below!</p>
+
+<table>
+  <tr>
+    <th>TicketNo</th>
+    <th>Name</th>
+      <th>Manage</th>
+  </tr>
+{% for q in flagticket %}
+  <tr>
+     <td>{{q.ticketNo}}</td>
+    <td>{{q.assigned}}</td>
+    <td>{{q.id}}</td>
+      <td><a class="btn btn-outline-danger btn-sm mt-1 mb-1" href="{% url 'ticket-delete' q.id %}">Delete</a></td>
+  </tr>
+{% endfor %}
+</table>
+
+{% endblock content %}

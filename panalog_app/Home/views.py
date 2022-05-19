@@ -19,6 +19,8 @@ import json
 
 
 def home(request):
+
+
     context = {
         'month':Ticket.objects.filter(classt="Active"),
         'title': 'Home'
@@ -28,11 +30,14 @@ def home(request):
     return render(request, 'Home/home.html', context)
 
 class PostListView(LoginRequiredMixin, ListView):
+
     model = Ticket
     template_name = 'Home/home.html'
     context_object_name = 'tix'
     def get_queryset(self):
-        return Ticket.objects.filter(classt="Active").filter(assigned=self.request.user.first_name).order_by('-date_created')
+        assigned = (self.request.user.last_name + ", " + self.request.user.first_name)
+        print(assigned)
+        return Ticket.objects.filter(classt="Active").filter(assigned=assigned).order_by('-date_created')
     ordering = ['-date_created']
     paginate_by = 5
 
@@ -53,10 +58,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Ticket
     success_url = "/"
     def test_func(self):
-        ticket = self.get_object()
-        if self.request.user.username == ticket.assigned:
-            return True
-        return False
+        return True
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Ticket
@@ -65,7 +67,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         ticket = self.get_object()
-        if self.request.user.username == ticket.assigned:
+        if (self.request.user.last_name + ", " + self.request.user.first_name) == ticket.assigned:
             return True
         return False
 
@@ -75,7 +77,7 @@ def createticket(request):
         form = ticketform(request.POST)
         if form.is_valid():
             q1 = form.save(commit=False)
-            q1.assigned = request.user.username
+            q1.assigned = (request.user.last_name + ", " + request.user.first_name)
             q1.classt = "Active"
             q1.save()
             return HttpResponseRedirect('/create?submitted=True')
@@ -92,10 +94,6 @@ def createticket(request):
     return render(request, 'Home/create_ticket.html', context)
 
 def about(request):
-    #user = User.objects.get(id=4)
-    #print("USER", user.__dict__)
-
-    #print(request.user.get_full_name())
 
     context = {
         'title': 'About',
@@ -144,7 +142,7 @@ def export(request):
     for q in Ticket.objects.all().values_list('ticketNo', 'assigned', 'description', 'date_created'):
         writer.writerow(q)
 
-    response['Content-Disposition'] = 'attachment; filename="questions.csv"'
+    response['Content-Disposition'] = 'attachment; filename="ExportedTickets.csv"'
 
     return response
 
@@ -152,27 +150,48 @@ def hallnonlogger(request):
 
     nonlog = Ticket.objects.values("assigned").filter(classt="Active").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
 
-    non = Profile.objects.all()
+    ticket = Ticket.objects.filter(classt="Active")
 
     #Get the Intersection of Existing Tickets and Existing Users, as there maybe tickets made from other department, or tickets assigned to non existing users.
-    trueTickets = Ticket.objects.all().filter(classt="Active").filter(mandays="0").values("assigned")
-    trueUsers = User.objects.all().values("username")
-    qs1 = trueUsers.intersection(trueTickets)
+    trueTickets = ticket.filter(mandays="0").values("assigned")
+    print("True Tickets")
+    print(trueTickets)
+    #trueUsers = User.objects.all().values("username")
+    #trueUsers = User.object.values("fullname")
+    #print("True Users")
+    #print(trueUsers)
+    qs = Profile.objects.values("fullname")
 
+    print(qs)
+    qs6 = Profile.objects.values("user_id", "fullname")
+    print("USERID ")
+    print(qs6)
+
+
+
+    qs1 = qs.intersection(trueTickets)
+    print("INTERSECTION HERE")
+    print(qs1)
+    #print(qs1)
     #print("GGGGGGGGGGGGGGGG")
     #print(qs1)
-
+    qs5 = Profile.objects.filter(fullname__in=qs1).values("user_id")
+    print("GET the ID of the USER using profile.fullname")
+    print(qs5)
     #qs = User.objects.filter(username__in=["Jack","Joel"])
-    qs = User.objects.filter(username__in=qs1)
-    print("Users")
-    print(qs)
+    qs3 = User.objects.filter(id__in=qs5)
+    print("Getting User.object where ID is IN ")
+    print(qs3)
+    #print("Users")
+    #print(qs)
     #print(qs)
 
 
     context = {
         'tix': nonlog,
-        'title': 'hall',
-        'trueTixnUser': qs,
+        'tixs': ticket,
+        'title': 'NonLogger Hall',
+        'trueTixnUser': qs3,
 
     }
     return render(request, 'Home/nonlogger.html', context)
@@ -192,7 +211,7 @@ def search(request):
 @login_required
 @manager_only
 def month(request):
-
+    tixs = Ticket.objects.filter(classt="Active")
     var2 = ""
     var3 = ""
     result1 = ""
@@ -216,6 +235,7 @@ def month(request):
         'title': 'Active Month',
         'result': result1,
         'active': active,
+        'tixs': tixs,
 
     }
     return render(request, 'Home/activemonth.html', context)
@@ -223,9 +243,37 @@ def month(request):
 
 def allmember(request):
     result1 = User.objects.filter(is_staff=False)
+
+
     context = {
         'title': 'All Members',
         'result': result1,
     }
     return render(request, 'Home/allmembers.html', context)
 
+@login_required
+@manager_only
+def flagtix(request):
+
+    trueTickets = Ticket.objects.all().filter(classt="Active").values("assigned")
+
+    trueUsers = User.objects.all().values("username")
+    #trueUsers2 = User.objects.all().values("first_name", "last_name")
+
+    print(trueTickets)
+    print(trueUsers)
+    qs2 = trueTickets.difference(trueUsers)
+    print("Abnormal User Found")
+    print(qs2)
+
+    qs = Ticket.objects.filter(assigned__in=qs2)
+    print("Users")
+    print(qs)
+
+
+
+    context = {
+        'title': 'Flag Ticket',
+        'flagticket': qs,
+    }
+    return render(request, 'Home/flagtix.html', context)

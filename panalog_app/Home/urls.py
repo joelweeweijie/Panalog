@@ -18,4 +18,5 @@ urlpatterns = [
     path('export/', views.export, name='Pana-export'),
     path('actmth/', views.month, name='Pana-actmonth'),
     path('allmem/', views.allmember, name='Pana-allmem'),
+    path('flagticket/', views.flagtix, name='Pana-flagtix')
 ]

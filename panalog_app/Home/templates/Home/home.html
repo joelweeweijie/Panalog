@@ -28,6 +28,7 @@ tr:nth-child(even) {
     <th>TicketID</th>
     <th>Assignee</th>
     <th>Mandays</th>
+    <th>A Mandays</th>
     <th>Description</th>
     <th>Date Created</th>
     <th>Manage</th>
@@ -38,6 +39,7 @@ tr:nth-child(even) {
     <!--<td><a class="mr-2" href="{% url 'user-ticket' q.assigned %}">{{q.assigned}}</a></td>-->
     <td>{{q.assigned}}</td>
     <td>{{q.mandays}}</td>
+    <td>{{q.amandays}}</td>
     <td>{{q.description}}</td>
     <td>{{q.date_created}}</td>
     <!--<td style="padding:10px;"><a href="{% url 'ticket-detail' q.id %}">Edit</a></td>-->

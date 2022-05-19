@@ -8,6 +8,7 @@ class Profile(models.Model):
     #if user deleted > profile deleted, profile deleted > user will not delete
     team = models.CharField(null=True, blank=True, max_length=10) # BASIS
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
+    fullname = models.CharField(null=True, blank=True, max_length=50)
 
     def __str__(self):
         return f'{self.user.username} Profile'
