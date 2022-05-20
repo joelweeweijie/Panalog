@@ -35,7 +35,7 @@ class PostListView(LoginRequiredMixin, ListView):
     template_name = 'Home/home.html'
     context_object_name = 'tix'
     def get_queryset(self):
-        assigned = (self.request.user.last_name + ", " + self.request.user.first_name)
+        assigned = (self.request.user.profile.fullname)
         print(assigned)
         return Ticket.objects.filter(classt="Active").filter(assigned=assigned).order_by('-date_created')
     ordering = ['-date_created']
@@ -67,7 +67,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         ticket = self.get_object()
-        if (self.request.user.last_name + ", " + self.request.user.first_name) == ticket.assigned:
+        if (self.request.user.profile.fullname) == ticket.assigned:
             return True
         return False
 
@@ -77,7 +77,7 @@ def createticket(request):
         form = ticketform(request.POST)
         if form.is_valid():
             q1 = form.save(commit=False)
-            q1.assigned = (request.user.last_name + ", " + request.user.first_name)
+            q1.assigned = (request.user.profile.fullname)
             q1.classt = "Active"
             q1.save()
             return HttpResponseRedirect('/create?submitted=True')
@@ -256,20 +256,17 @@ def allmember(request):
 def flagtix(request):
 
     trueTickets = Ticket.objects.all().filter(classt="Active").values("assigned")
-
     trueUsers = Profile.objects.values("fullname")
     #trueUsers2 = User.objects.all().values("first_name", "last_name")
-
-    print(trueTickets)
-    print(trueUsers)
+    #print(trueTickets)
+    #print(trueUsers)
     qs2 = trueTickets.difference(trueUsers)
-    print("Abnormal User Found")
-    print(qs2)
+    #print("Abnormal User Found")
+    #print(qs2)
 
     qs = Ticket.objects.filter(assigned__in=qs2)
-    print("Users")
-    print(qs)
-
+    #print("Users")
+    #print(qs)
 
 
     context = {

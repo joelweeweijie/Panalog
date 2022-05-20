@@ -9,7 +9,7 @@
         <form method="post">
             {% csrf_token %}
             <fieldset class="form-group2">
-                <label>Assigned:</label><input type="text" disabled value="{{ request.user.first_name }}, {{ request.user.last_name }}">
+                <label>Assigned:</label><input type="text" disabled value="{{ request.user.profile.fullname }}">
                 {{ form.as_p }}
             </fieldset>
             <div class="form-group">
