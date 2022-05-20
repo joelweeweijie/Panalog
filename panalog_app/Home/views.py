@@ -257,7 +257,7 @@ def flagtix(request):
 
     trueTickets = Ticket.objects.all().filter(classt="Active").values("assigned")
 
-    trueUsers = User.objects.all().values("username")
+    trueUsers = Profile.objects.values("fullname")
     #trueUsers2 = User.objects.all().values("first_name", "last_name")
 
     print(trueTickets)
