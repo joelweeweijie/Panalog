@@ -268,7 +268,7 @@ def flagtix(request):
     #print("Users")
     #print(qs)
 
-
+#ertyjk
     context = {
         'title': 'Flag Ticket',
         'flagticket': qs,
