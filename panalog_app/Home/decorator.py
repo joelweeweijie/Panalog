@@ -9,6 +9,8 @@ def manager_only(view_func):
             return redirect('Pana-home')
         if group == 'manager':
             return view_func(request, *args, **kwargs)
+        else:
+            return redirect('Pana-home')
 
     return wrapper_function
 
@@ -22,5 +24,7 @@ def member_only(view_func):
             return redirect('Pana-home')
         if group == 'member':
             return view_func(request, *args, **kwargs)
+        else:
+            return redirect('Pana-home')
 
     return wrapper_function

@@ -35,9 +35,8 @@ class PostListView(LoginRequiredMixin, ListView):
     template_name = 'Home/home.html'
     context_object_name = 'tix'
     def get_queryset(self):
-        assigned = (self.request.user.profile.fullname)
-        print(assigned)
-        return Ticket.objects.filter(classt="Active").filter(assigned=assigned).order_by('-date_created')
+        currentUser = (self.request.user.profile.fullname)
+        return Ticket.objects.filter(classt="Active").filter(assigned=currentUser).order_by('-date_created')
     ordering = ['-date_created']
     paginate_by = 5
 
@@ -71,6 +70,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             return True
         return False
 
+@login_required
 def createticket(request):
     submitted = False
     if request.method == "POST":
@@ -105,7 +105,6 @@ def about(request):
 @manager_only
 def uploadcsv(request):
     context = {
-        'tix':Ticket.objects.all(),
         'title': 'Upload CSV'
     }
     if request.method == 'GET':
@@ -154,34 +153,34 @@ def hallnonlogger(request):
 
     #Get the Intersection of Existing Tickets and Existing Users, as there maybe tickets made from other department, or tickets assigned to non existing users.
     trueTickets = ticket.filter(mandays="0").values("assigned")
-    print("True Tickets")
-    print(trueTickets)
+    #print("True Tickets")
+    #print(trueTickets)
     #trueUsers = User.objects.all().values("username")
     #trueUsers = User.object.values("fullname")
     #print("True Users")
     #print(trueUsers)
     qs = Profile.objects.values("fullname")
 
-    print(qs)
+    #print(qs)
     qs6 = Profile.objects.values("user_id", "fullname")
-    print("USERID ")
-    print(qs6)
+    #print("USERID ")
+    #print(qs6)
 
 
 
     qs1 = qs.intersection(trueTickets)
-    print("INTERSECTION HERE")
-    print(qs1)
+    #print("INTERSECTION HERE")
+    #print(qs1)
     #print(qs1)
     #print("GGGGGGGGGGGGGGGG")
     #print(qs1)
     qs5 = Profile.objects.filter(fullname__in=qs1).values("user_id")
-    print("GET the ID of the USER using profile.fullname")
-    print(qs5)
+    #print("GET the ID of the USER using profile.fullname")
+    #print(qs5)
     #qs = User.objects.filter(username__in=["Jack","Joel"])
     qs3 = User.objects.filter(id__in=qs5)
-    print("Getting User.object where ID is IN ")
-    print(qs3)
+    #print("Getting User.object where ID is IN ")
+    #print(qs3)
     #print("Users")
     #print(qs)
     #print(qs)
@@ -265,6 +264,8 @@ def flagtix(request):
     #print(qs2)
 
     qs = Ticket.objects.filter(assigned__in=qs2)
+    qs.update(flag=True)
+
     #print("Users")
     #print(qs)
 

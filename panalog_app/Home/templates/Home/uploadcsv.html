@@ -18,22 +18,7 @@ tr:nth-child(even) {
   background-color: #dddddd;
 }
 </style>
-<table>
-  <tr>
-    <th>TicketID</th>
-    <th>Assignee</th>
-      <th>Description</th>
-      <th>Date Created</th>
-  </tr>
-{% for q in tix %}
-  <tr>
-    <td>{{q.ticketNo}}</td>
-    <td>{{q.assigned}}</td>
-      <td>{{q.description}}</td>
-      <td>{{q.date_created}}</td>
-  </tr>
-{% endfor %}
-</table>
+
     {% for message in messages %}
     <div>
         <strong>{{message|safe}}</strong>
