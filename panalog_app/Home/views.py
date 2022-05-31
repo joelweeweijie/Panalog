@@ -123,9 +123,8 @@ def uploadcsv(request):
                 ticketNo=column[0],
                 assigned=column[1],
                 description=column[2],
-                date_created=column[3] #YYYY-MM-DD
+                date_created=column[3]
             )
-
         messages.success(request, 'Successfully uploaded')
     return render(request, 'Home/uploadcsv.html', context)
 
@@ -147,50 +146,25 @@ def export(request):
 
 def hallnonlogger(request):
 
-    nonlog = Ticket.objects.values("assigned").filter(classt="Active").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
+    name_nonloggers = Ticket.objects.values("assigned").filter(classt="Active").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
 
     ticket = Ticket.objects.filter(classt="Active")
 
     #Get the Intersection of Existing Tickets and Existing Users, as there maybe tickets made from other department, or tickets assigned to non existing users.
-    trueTickets = ticket.filter(mandays="0").values("assigned")
-    #print("True Tickets")
-    #print(trueTickets)
-    #trueUsers = User.objects.all().values("username")
-    #trueUsers = User.object.values("fullname")
-    #print("True Users")
-    #print(trueUsers)
+    tickets_zero_mandays = ticket.filter(mandays="0").values("assigned")
     qs = Profile.objects.values("fullname")
-
-    #print(qs)
-    qs6 = Profile.objects.values("user_id", "fullname")
-    #print("USERID ")
-    #print(qs6)
-
-
-
-    qs1 = qs.intersection(trueTickets)
-    #print("INTERSECTION HERE")
-    #print(qs1)
-    #print(qs1)
-    #print("GGGGGGGGGGGGGGGG")
-    #print(qs1)
+    #finding the intersection of EXISTING Users and EXISTING Tickets.
+    qs1 = qs.intersection(tickets_zero_mandays)
+    #retriece User_id of EXISTING Users with None logged Tickets
     qs5 = Profile.objects.filter(fullname__in=qs1).values("user_id")
-    #print("GET the ID of the USER using profile.fullname")
-    #print(qs5)
-    #qs = User.objects.filter(username__in=["Jack","Joel"])
-    qs3 = User.objects.filter(id__in=qs5)
-    #print("Getting User.object where ID is IN ")
-    #print(qs3)
-    #print("Users")
-    #print(qs)
-    #print(qs)
-
+    #retrieve user object based on the User_id
+    total_users_who_nonlog = User.objects.filter(id__in=qs5)
 
     context = {
-        'tix': nonlog,
+        'tix': name_nonloggers,
         'tixs': ticket,
         'title': 'NonLogger Hall',
-        'trueTixnUser': qs3,
+        'trueTixnUser': total_users_who_nonlog,
 
     }
     return render(request, 'Home/nonlogger.html', context)
@@ -211,24 +185,24 @@ def search(request):
 @manager_only
 def month(request):
     tixs = Ticket.objects.filter(classt="Active")
-    var2 = ""
-    var3 = ""
+    month_selected = ""
+    year_selected = ""
     result1 = ""
 
     if request.method == 'POST':
-        var2 = request.POST.get("letter", False)
-        var3 = request.POST.get("year", False)
-        print(var2, var3)
+        month_selected = request.POST.get("dynamic_month", False)
+        year_selected = request.POST.get("dynamic_year", False)
+        #print(var2, var3)
 
-        result1 = Ticket.objects.filter(date_created__year__gte=var3, date_created__month__gte=var2,
-                                     date_created__year__lte=var3, date_created__month__lte=var2)
+        result1 = Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,
+                                     date_created__year__lte=year_selected, date_created__month__lte=month_selected)
 
         Ticket.objects.filter(classt="Active").update(classt="Inactive")
 
-        Ticket.objects.filter(date_created__year__gte=var3, date_created__month__gte=var2,
-                              date_created__year__lte=var3, date_created__month__lte=var2).update(classt="Active")
+        Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,
+                              date_created__year__lte=year_selected, date_created__month__lte=month_selected).update(classt="Active")
 
-    active = var2 + " " + var3
+    active = month_selected + " " + year_selected
 
     context = {
         'title': 'Active Month',

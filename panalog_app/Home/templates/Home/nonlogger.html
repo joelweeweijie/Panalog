@@ -73,11 +73,4 @@ tr:nth-child(even) {
   <br>
   <p>Emails: {% for a in trueTixnUser %} {{ a.email }}; {% endfor %}</p>
 </div>
-
-{% if user.is_authenticated %}
-        <p>authenticated</p>
-      {% else %}
-        <p>NOT authenticated</p>
-      {% endif %}
-
 {% endblock content %}

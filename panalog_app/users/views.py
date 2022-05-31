@@ -10,11 +10,14 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.save()
 
-            username = form.cleaned_data.get('username')
+            user.save()
+            #username = form.cleaned_data.get('username')
             group = Group.objects.get(name='member')
             user.groups.add(group)
+            user.profile.fullname = form.cleaned_data.get('fullname')
+            user.save()
+
 
             messages.success(request, f'Account Created, Login Now!')
             return redirect('login')

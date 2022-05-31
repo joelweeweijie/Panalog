@@ -9,29 +9,14 @@
 <form action="" method="post">
     {% csrf_token %}
     Release month :
-    <select name="letter">
-        <option value="01">January</option>
-        <option value="02">February</option>
-        <option value="03">March</option>
-        <option value="04">April</option>
-        <option value="05">May</option>
-        <option value="06">June</option>
-        <option value="07">July</option>
-        <option value="08">August</option>
-        <option value="09">September</option>
-        <option value="10">October</option>
-        <option value="11">Novmeber</option>
-        <option value="12">December</option>
-    </select>
-    <select name="year">
-        <option value="2020">2020</option>
-        <option value="2021">2021</option>
-        <option value="2022">2022</option>
-        <option value="2023">2023</option>
-        <option value="2024">2024</option>
-        <option value="2025">2025</option>
-    </select>
-<input type="submit" value="Submit">
+    <select id="dynamic_month" name="dynamic_month"></select>
+    <select id="dynamic_year" name="dynamic_year"></select>
+    <input type="submit" value="Submit">
+
+    <br>
+
+
+
 <br>
 
 </form>
@@ -49,7 +34,7 @@
 {% for q in result %}
   <tr>
     <td>{{q.ticketNo}}</td>
-    <td><a class="mr-2" href="{% url 'user-ticket' q.assigned %}">{{q.assigned}}</a></td>
+    <td>{{q.assigned}}</td>
     <td>{{q.mandays}}</td>
     <td>{{q.description}}</td>
     <td>{{q.date_created}}</td>
@@ -62,4 +47,46 @@
 
 
 
+<script>
+(function () {
+    let year_satart = 2020;
+    let year_end = (new Date).getFullYear(); // current year
+    let year_selected = (new Date).getFullYear();
+
+    let option = '';
+    //option = '<option>Year</option>'; // first option
+
+    for (let i = year_satart; i <= year_end; i++) {
+        let selected = (i === year_selected ? ' selected' : '');
+        option += '<option value="' + i + '"' + selected + '>' + i + '</option>';
+    }
+
+    document.getElementById("dynamic_year").innerHTML = option;
+})();
+(function () {
+    // let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var month_selected = (new Date).getMonth(); // current month
+    var option = '';
+    //option = '<option>Month</option>'; // first option
+
+    for (let i = 0; i < months.length; i++) {
+        let month_number = (i + 1);
+
+        // value month number with 0. [01 02 03 04..]
+        let month = (month_number <= 9) ? '0' + month_number : month_number;
+
+        // or value month number. [1 2 3 4..]
+        // let month = month_number;
+
+        // or value month names. [January February]
+        // let month = months[i];
+
+        let selected = (i === month_selected ? ' selected' : '');
+        option += '<option value="' + month + '"' + selected + '>' + months[i] + '</option>';
+    }
+    document.getElementById("dynamic_month").innerHTML = option;
+})();
+</script>
 {% endblock content %}
