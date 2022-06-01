@@ -3,7 +3,7 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
         {% load static %}
@@ -28,20 +28,21 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="{% url 'Pana-about' %}">Abt</a>
-                <a class="nav-item nav-link" href="{% url 'Pana-allmem' %}">AllM</a>
-                <a class="nav-item nav-link" href="{% url 'Pana-hall' %}">NonLogger</a>
+
+              <a class="nav-item nav-link" href="{% url 'Pana-about' %}"><i class='fas fa-book'></i> About</a>
+                <a class="nav-item nav-link" href="{% url 'Pana-allmem' %}"><i class='fas fa-user-friends'></i> Members</a>
+                <a class="nav-item nav-link" href="{% url 'Pana-hall' %}"><i class='fas fa-building'></i> NonLogger</a>
                 {% if user.is_authenticated %}
                     {% for group in  request.user.groups.all %}
                         {%  if 'manager' == group.name %}
                 <li class="nav-item dropdown">
-                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Manager</a>
+                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class='fas fa-balance-scale'></i> Manager</a>
                             <div class="dropdown-menu">
-                              <a class="dropdown-item" href="{% url 'Pana-uploadcsv' %}">Upload CSV</a>
+                              <a class="dropdown-item" href="{% url 'Pana-uploadcsv' %}"><i class='fas fa-file-csv'></i> Upload CSV</a>
                                 <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="{% url 'Pana-actmonth' %}">Active Month</a>
+                              <a class="dropdown-item" href="{% url 'Pana-actmonth' %}"><i class='fas fa-chalkboard-teacher'></i> Active Month</a>
                               <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="{% url 'Pana-flagtix' %}">Flag Ticket</a>
+                              <a class="dropdown-item" href="{% url 'Pana-flagtix' %}"><i class='far fa-flag'></i> Flag Ticket</a>
                             </div>
                 </li>
                         {% endif %}
@@ -52,9 +53,9 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
                 {% if user.is_authenticated %}
-                <a class="nav-item nav-link" href="{% url 'ticket-create' %}">NewTicket</a>
-                <a class="nav-link font-italic" href="{% url 'profile' %}">Logged in as [{{user.username}}]</a>
-                <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
+                <a class="nav-item nav-link" href="{% url 'ticket-create' %}"><i class='fas fa-ticket-alt'></i> NewTicket</a>
+                <a class="nav-link font-italic" href="{% url 'profile' %}"><i class='fas fa-address-card'></i> Logged in as [{{user.username}}]</a>
+                <a class="nav-item nav-link" href="{% url 'logout' %}"><i class='fas fa-sign-out-alt'></i> Logout</a>
                 {% else %}
               <a class="nav-item nav-link" href="{% url 'login'%}">Login</a>
 <!--              <a class="nav-item nav-link" href="{% url 'register'%}">Register</a>-->

@@ -2,9 +2,9 @@
 {% block content %}
 
     <h2>Active Month</h2>
-    <h3>{{ active }}</h3>
+    <h3>{{ newactive }}</h3>
 
-<p style="color:blue;font-size:50px;">"{{ tixs.0.date_created|date:"M, Y" }}"</p>
+<p style="color:blue;font-size:50px;">"{{ active.0.date_created|date:"M, Y" }}"</p>
 
 <form action="" method="post">
     {% csrf_token %}

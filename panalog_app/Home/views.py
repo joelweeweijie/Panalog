@@ -110,6 +110,7 @@ def uploadcsv(request):
     if request.method == 'GET':
         return render(request, 'Home/uploadcsv.html', context)
 
+
     csv_file = request.FILES['file']
     # check if its is a csv file
     if not csv_file.name.endswith('.csv'):
@@ -118,12 +119,24 @@ def uploadcsv(request):
         data_set = csv_file.read().decode('UTF-8')
         io_string = io.StringIO(data_set)
         next(io_string) #skips first line in csv "header"
-        for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+        for column in csv.reader(io_string, delimiter=',', quotechar='"'):
             _, created = Ticket.objects.update_or_create(
                 ticketNo=column[0],
-                assigned=column[1],
-                description=column[2],
-                date_created=column[3]
+                type=column[1],
+                team=column[2],
+                customercode=column[3],
+                assigned=column[4],
+                #assigned=column[4] + column[5],
+                mandays=column[5],
+                description=column[6],
+                changereason=column[7],
+                status=column[8],
+                date_created=column[9],
+                date_targetclose=column[10],
+                date_close=column[11],
+                requester=column[12],
+                reasoncode=column[13],
+                classt=column[14]
             )
         messages.success(request, 'Successfully uploaded')
     return render(request, 'Home/uploadcsv.html', context)
@@ -135,9 +148,9 @@ def export(request):
     response = HttpResponse(content_type='text/csv')
 
     writer = csv.writer(response)
-    writer.writerow(['ticketNo', 'assigned', 'description', 'date_created'])
+    writer.writerow(['ticketNo', 'type', 'team', 'customercode', 'assigned', 'mandays', 'description', 'changereason', 'status', 'date_created', 'date_targetclose', 'date_close', 'requester', 'reasoncode', 'classt'])
 
-    for q in Ticket.objects.all().values_list('ticketNo', 'assigned', 'description', 'date_created'):
+    for q in Ticket.objects.all().values_list('ticketNo', 'type', 'team', 'customercode', 'assigned', 'mandays', 'description', 'changereason', 'status', 'date_created', 'date_targetclose', 'date_close', 'requester', 'reasoncode', 'classt'):
         writer.writerow(q)
 
     response['Content-Disposition'] = 'attachment; filename="ExportedTickets.csv"'
@@ -184,7 +197,8 @@ def search(request):
 @login_required
 @manager_only
 def month(request):
-    tixs = Ticket.objects.filter(classt="Active")
+
+    active_month = Ticket.objects.filter(classt="Active")
     month_selected = ""
     year_selected = ""
     result1 = ""
@@ -196,19 +210,19 @@ def month(request):
 
         result1 = Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,
                                      date_created__year__lte=year_selected, date_created__month__lte=month_selected)
-
+        #make all tickets currently active tickets = Inactive
         Ticket.objects.filter(classt="Active").update(classt="Inactive")
-
+        #make tickets created in specified month Active
         Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,
                               date_created__year__lte=year_selected, date_created__month__lte=month_selected).update(classt="Active")
 
-    active = month_selected + " " + year_selected
+    new_active_month = month_selected + " " + year_selected
 
     context = {
         'title': 'Active Month',
         'result': result1,
-        'active': active,
-        'tixs': tixs,
+        'active': active_month,
+        'newactive': new_active_month,
 
     }
     return render(request, 'Home/activemonth.html', context)
