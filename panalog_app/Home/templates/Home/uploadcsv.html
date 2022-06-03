@@ -28,9 +28,20 @@ tr:nth-child(even) {
 
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+        Release month :
+        <select id="dynamic_month" name="dynamic_month"></select>
+        <select id="dynamic_year" name="dynamic_year"></select>
+        <br>
+        <!--<select name="month_from_model" id="month_from_model">
+            {% for avail in month_avail %}
+            <option value="{{avail.id}}">{{avail.month_year}}</option>
+            {% endfor %}
+        </select>-->
+        <br>
         <p>Order of CSV should be </p>
         {% load static %}
         <img src="{% static '/csvformat.PNG' %}" alt="My image" width="550">
+        <br>
         <br>
         <label for="file1"> Upload a file</label>
         <small>Only accepts CSV files</small>
@@ -39,4 +50,47 @@ tr:nth-child(even) {
 
         <button type="submit" class="btn btn-outline-primary">Upload</button>
     </form>
+
+<script>
+(function () {
+    let year_satart = 2020;
+    let year_end = (new Date).getFullYear(); // current year
+    let year_selected = (new Date).getFullYear();
+
+    let option = '';
+    //option = '<option>Year</option>'; // first option
+
+    for (let i = year_satart; i <= year_end; i++) {
+        let selected = (i === year_selected ? ' selected' : '');
+        option += '<option value="' + i + '"' + selected + '>' + i + '</option>';
+    }
+
+    document.getElementById("dynamic_year").innerHTML = option;
+})();
+(function () {
+    // let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var month_selected = (new Date).getMonth(); // current month
+    var option = '';
+    //option = '<option>Month</option>'; // first option
+
+    for (let i = 0; i < months.length; i++) {
+        let month_number = (i + 1);
+
+        // value month number with 0. [01 02 03 04..]
+        let month = (month_number <= 9) ? '0' + month_number : month_number;
+
+        // or value month number. [1 2 3 4..]
+        // let month = month_number;
+
+        // or value month names. [January February]
+        // let month = months[i];
+
+        let selected = (i === month_selected ? ' selected' : '');
+        option += '<option value="' + month + '"' + selected + '>' + months[i] + '</option>';
+    }
+    document.getElementById("dynamic_month").innerHTML = option;
+})();
+</script>
 {% endblock content %}

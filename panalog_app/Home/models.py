@@ -4,7 +4,15 @@ from users.models import User
 
 # Create your models here.
 # Mandays  models.DecimalField(null=True, blank=True, default='0', max_digits=5, decimal_places=2)
+class Ticket_month_year(models.Model):
+    month_year = models.CharField(max_length=30, unique=True, default='00.0000') #Jan_2022
+
+    def __str__(self):
+        return self.month_year
+
+#month_year = models.ForeignKey(Ticket_month_year, on_delete=models.DO_NOTHING)
 class Ticket(models.Model):
+    month_year = models.ForeignKey(Ticket_month_year, to_field='month_year', on_delete=models.DO_NOTHING)
     ticketNo = models.CharField(max_length=20) #200-238541
     type = models.CharField(null=True, blank=True, max_length=25) # change request
     team = models.CharField(null=True, blank=True, max_length=10) # BASIS

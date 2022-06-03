@@ -6,7 +6,7 @@ from .models import Profile
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
-    fullname = forms.CharField(max_length=50, help_text="Last, First")
+    fullname = forms.CharField(max_length=50, help_text="**The names must match to assigned in ITMAS (Last, First) e.g. Wee, Joel / Kurniawan, Dhany / Jadhav, Sumit ")
 
     class Meta:
         model = User

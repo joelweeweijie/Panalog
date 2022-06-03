@@ -28,8 +28,10 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-
-              <a class="nav-item nav-link" href="{% url 'Pana-about' %}"><i class='fas fa-book'></i> About</a>
+                {% if user.is_staff %}
+                <a class="nav-item nav-link" href="{% url 'register' %}"><i class='fas fa-book'></i> Register</a>
+                {% else %}
+                <a class="nav-item nav-link" href="{% url 'Pana-about' %}"><i class='fas fa-book'></i> About</a>
                 <a class="nav-item nav-link" href="{% url 'Pana-allmem' %}"><i class='fas fa-user-friends'></i> Members</a>
                 <a class="nav-item nav-link" href="{% url 'Pana-hall' %}"><i class='fas fa-building'></i> NonLogger</a>
                 {% if user.is_authenticated %}
@@ -48,6 +50,9 @@
                         {% endif %}
                     {% endfor %}
               {% endif %}
+
+                {% endif %}
+
             </div>
 
             <!-- Navbar Right Side -->

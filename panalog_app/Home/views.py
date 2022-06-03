@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Ticket
+from .models import Ticket, Ticket_month_year
 from users.models import Profile
 import csv
 import io
@@ -77,6 +77,7 @@ def createticket(request):
         form = ticketform(request.POST)
         if form.is_valid():
             q1 = form.save(commit=False)
+            q1.month_year = Ticket_month_year.objects.get(month_year="XX.XXXX")
             q1.assigned = (request.user.profile.fullname)
             q1.classt = "Active"
             q1.save()
@@ -104,12 +105,20 @@ def about(request):
 @login_required
 @manager_only
 def uploadcsv(request):
+    month_year_available = Ticket_month_year.objects.all()
+    print("%%%%%%%%")
+    print(month_year_available.values)
+
+    testing1 = Ticket_month_year._meta.get_fields()
+    print(testing1)
+
     context = {
-        'title': 'Upload CSV'
+        'title': 'Upload CSV',
+        'month_avail': month_year_available,
     }
+
     if request.method == 'GET':
         return render(request, 'Home/uploadcsv.html', context)
-
 
     csv_file = request.FILES['file']
     # check if its is a csv file
@@ -117,10 +126,22 @@ def uploadcsv(request):
         messages.error(request, "Not a CSV file")
     else:
         data_set = csv_file.read().decode('UTF-8')
+
+        month_from_model = request.POST.get("month_from_model", False)
+        print(month_from_model)
+
+        month_selected = request.POST.get("dynamic_month", False)
+        year_selected = request.POST.get("dynamic_year", False)
+
+        month_from_model = month_selected + "." + year_selected
+        b = Ticket_month_year(month_year=month_from_model)
+        b.save()
+
         io_string = io.StringIO(data_set)
         next(io_string) #skips first line in csv "header"
         for column in csv.reader(io_string, delimiter=',', quotechar='"'):
             _, created = Ticket.objects.update_or_create(
+                month_year=Ticket_month_year.objects.get(month_year=month_from_model),
                 ticketNo=column[0],
                 type=column[1],
                 team=column[2],
@@ -198,32 +219,38 @@ def search(request):
 @manager_only
 def month(request):
 
+    month_year_available = Ticket_month_year.objects.all()
+
     active_month = Ticket.objects.filter(classt="Active")
     month_selected = ""
     year_selected = ""
     result1 = ""
 
     if request.method == 'POST':
-        month_selected = request.POST.get("dynamic_month", False)
-        year_selected = request.POST.get("dynamic_year", False)
+
         #print(var2, var3)
 
-        result1 = Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,
-                                     date_created__year__lte=year_selected, date_created__month__lte=month_selected)
+        #result1 = Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,date_created__year__lte=year_selected, date_created__month__lte=month_selected)
         #make all tickets currently active tickets = Inactive
         Ticket.objects.filter(classt="Active").update(classt="Inactive")
         #make tickets created in specified month Active
-        Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,
-                              date_created__year__lte=year_selected, date_created__month__lte=month_selected).update(classt="Active")
+        #Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,date_created__year__lte=year_selected, date_created__month__lte=month_selected).update(classt="Active")
 
-    new_active_month = month_selected + " " + year_selected
+        #Ticket.objects.filter(date_close__year__gte=year_selected, date_close__month__gte=month_selected,date_close__year__lte=year_selected, date_close__month__lte=month_selected).update(classt="Active")
+
+        month_from_drop = request.POST.get("month_from_model", False)
+        print("printing the value from drop down")
+        print(month_from_drop)
+        q1 = Ticket.objects.filter(month_year=month_from_drop).update(classt="Active")
+        print(q1)
+
+    #new_active_month = month_selected + " " + year_selected
 
     context = {
         'title': 'Active Month',
-        'result': result1,
+        'all_ticket_created_in_month': result1,
         'active': active_month,
-        'newactive': new_active_month,
-
+        'avail_months': month_year_available,
     }
     return render(request, 'Home/activemonth.html', context)
 
