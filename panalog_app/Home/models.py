@@ -6,6 +6,7 @@ from users.models import User
 # Mandays  models.DecimalField(null=True, blank=True, default='0', max_digits=5, decimal_places=2)
 class Ticket_month_year(models.Model):
     month_year = models.CharField(max_length=30, unique=True, default='00.0000') #Jan_2022
+    Active = models.BooleanField(default=False)
 
     def __str__(self):
         return self.month_year

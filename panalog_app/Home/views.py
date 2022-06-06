@@ -55,7 +55,7 @@ class PostDetailView(DetailView):
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Ticket
-    success_url = "/"
+    success_url = "/flagticket/"
     def test_func(self):
         return True
 
@@ -77,7 +77,7 @@ def createticket(request):
         form = ticketform(request.POST)
         if form.is_valid():
             q1 = form.save(commit=False)
-            q1.month_year = Ticket_month_year.objects.get(month_year="XX.XXXX")
+            q1.month_year = Ticket_month_year.objects.get(month_year="00.0000")
             q1.assigned = (request.user.profile.fullname)
             q1.classt = "Active"
             q1.save()
@@ -280,6 +280,7 @@ def flagtix(request):
 
     qs = Ticket.objects.filter(assigned__in=qs2)
     qs.update(flag=True)
+
 
     #print("Users")
     #print(qs)

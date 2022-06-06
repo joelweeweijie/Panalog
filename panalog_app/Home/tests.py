@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Ticket
+from .models import Ticket, Ticket_month_year
 # Create your tests here.
 
 
@@ -37,6 +37,7 @@ class Testhomeview(TestCase):
 
 class TestTicketCreation(TestCase):
     def test_ticket_creation(self):
+
         ticket1 = Ticket.objects.create(ticketNo = "222-222222")
         self.assertEqual(str(ticket1), "222-222222")
         print("Created Ticket 222-2222222 :", isinstance(ticket1,Ticket))
