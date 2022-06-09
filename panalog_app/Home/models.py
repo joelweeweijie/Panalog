@@ -13,7 +13,7 @@ class Ticket_month_year(models.Model):
 
 #month_year = models.ForeignKey(Ticket_month_year, on_delete=models.DO_NOTHING)
 class Ticket(models.Model):
-    month_year = models.ForeignKey(Ticket_month_year, to_field='month_year', on_delete=models.DO_NOTHING)
+    month_year = models.ForeignKey(Ticket_month_year, to_field='month_year', default='00.0000', on_delete=models.SET_DEFAULT)
     ticketNo = models.CharField(max_length=20) #200-238541
     type = models.CharField(null=True, blank=True, max_length=25) # change request
     team = models.CharField(null=True, blank=True, max_length=10) # BASIS

@@ -72,12 +72,15 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 @login_required
 def createticket(request):
+
+    currentactivemonth = Ticket_month_year.objects.get(Active=True)
+
     submitted = False
     if request.method == "POST":
         form = ticketform(request.POST)
         if form.is_valid():
             q1 = form.save(commit=False)
-            q1.month_year = Ticket_month_year.objects.get(month_year="00.0000")
+            q1.month_year = Ticket_month_year.objects.get(month_year=currentactivemonth)
             q1.assigned = (request.user.profile.fullname)
             q1.classt = "Active"
             q1.save()
@@ -127,13 +130,17 @@ def uploadcsv(request):
     else:
         data_set = csv_file.read().decode('UTF-8')
 
-        month_from_model = request.POST.get("month_from_model", False)
-        print(month_from_model)
+        month_from_model1 = request.POST.get("month_from_model", False)
+        print("Month_from_model")
+        print(month_from_model1)
 
         month_selected = request.POST.get("dynamic_month", False)
         year_selected = request.POST.get("dynamic_year", False)
 
         month_from_model = month_selected + "." + year_selected
+        print("month_selected + year_selected")
+        print(month_from_model)
+
         b = Ticket_month_year(month_year=month_from_model)
         b.save()
 
@@ -180,6 +187,8 @@ def export(request):
 
 def hallnonlogger(request):
 
+    active_month = Ticket_month_year.objects.filter(Active=True)
+
     name_nonloggers = Ticket.objects.values("assigned").filter(classt="Active").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
 
     ticket = Ticket.objects.filter(classt="Active")
@@ -196,7 +205,7 @@ def hallnonlogger(request):
 
     context = {
         'tix': name_nonloggers,
-        'tixs': ticket,
+        'tixs': active_month,
         'title': 'NonLogger Hall',
         'trueTixnUser': total_users_who_nonlog,
 
@@ -222,25 +231,24 @@ def month(request):
     month_year_available = Ticket_month_year.objects.all()
 
     active_month = Ticket.objects.filter(classt="Active")
+
+
+    active_month1 = Ticket_month_year.objects.filter(Active=True)
+    print(active_month1.values)
     month_selected = ""
     year_selected = ""
-    result1 = ""
+
 
     if request.method == 'POST':
-
-        #print(var2, var3)
-
-        #result1 = Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,date_created__year__lte=year_selected, date_created__month__lte=month_selected)
-        #make all tickets currently active tickets = Inactive
-        Ticket.objects.filter(classt="Active").update(classt="Inactive")
-        #make tickets created in specified month Active
-        #Ticket.objects.filter(date_created__year__gte=year_selected, date_created__month__gte=month_selected,date_created__year__lte=year_selected, date_created__month__lte=month_selected).update(classt="Active")
-
-        #Ticket.objects.filter(date_close__year__gte=year_selected, date_close__month__gte=month_selected,date_close__year__lte=year_selected, date_close__month__lte=month_selected).update(classt="Active")
 
         month_from_drop = request.POST.get("month_from_model", False)
         print("printing the value from drop down")
         print(month_from_drop)
+        Ticket_month_year.objects.filter(Active=True).update(Active=False)
+        setActive = Ticket_month_year.objects.filter(month_year=month_from_drop).update(Active=True)
+        print(setActive)
+        # make all tickets currently active tickets = Inactive
+        Ticket.objects.filter(classt="Active").update(classt="Inactive")
         q1 = Ticket.objects.filter(month_year=month_from_drop).update(classt="Active")
         print(q1)
 
@@ -248,8 +256,8 @@ def month(request):
 
     context = {
         'title': 'Active Month',
-        'all_ticket_created_in_month': result1,
         'active': active_month,
+        'active1': active_month1,
         'avail_months': month_year_available,
     }
     return render(request, 'Home/activemonth.html', context)

@@ -3,16 +3,11 @@
 
     <h2>Active Month</h2>
     <h3>{{ newactive }}</h3>
-
-<p style="color:blue;font-size:50px;">"{{ active.0.date_created|date:"M, Y" }}"</p>
+<p style="color:blue;font-size:50px;">"{{ active1.0.month_year }} wiht Tickets ={{ active.0.date_created|date:"M, Y" }}"</p>
 
 <form action="" method="post">
     {% csrf_token %}
-
-
-
     <br>
-
 <p>Available months</p>
     <select name="month_from_model" id="month_from_model">
             {% for avail in avail_months %}
@@ -20,40 +15,7 @@
             {% endfor %}
         </select>
     <input type="submit" value="Submit">
-
-
-
 <br>
-
 </form>
-
-<div>
-<table>
-  <tr>
-      <th>AvailableMonthModel</th>
-    <th>TicketID</th>
-    <th>Assignee</th>
-    <th>Mandays</th>
-    <th>Description</th>
-    <th>Date Created</th>
-    <th>Manage</th>
-  </tr>
-{% for q in all_ticket_created_in_month %}
-  <tr>
-      <td>{{q.month_year}}</td>
-    <td>{{q.ticketNo}}</td>
-    <td>{{q.assigned}}</td>
-    <td>{{q.mandays}}</td>
-    <td>{{q.description}}</td>
-    <td>{{q.date_created}}</td>
-    <!--<td style="padding:10px;"><a href="{% url 'ticket-detail' q.id %}">Edit</a></td>-->
-    <td><a href="{% url 'ticket-update' q.id %}">Update</a></td>
-  </tr>
-{% endfor %}
-</table>
-</div>
-
-
-
 
 {% endblock content %}
