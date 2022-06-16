@@ -19,9 +19,9 @@ class Ticket(models.Model):
     team = models.CharField(null=True, blank=True, max_length=10) # BASIS
     customercode = models.CharField(null=True, blank=True, max_length=10) # PLSVN
     assigned = models.CharField(null=True, blank=True, max_length=255) # Chen, Wang
-    mandays = models.IntegerField(null=True, blank=True, default='0')
+    mandays = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=1, default='0.00')
     abap = models.CharField(max_length=10, default='ABAP') # ABAP
-    amandays = models.IntegerField(null=True, blank=True, default='0')
+    amandays = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=1, default='0.00')
     description = models.TextField(null=True, blank=True,)
     changereason = models.TextField(null=True, blank=True,)
     status = models.CharField(null=True, blank=True, max_length=20) # Active

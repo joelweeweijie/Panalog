@@ -8,6 +8,7 @@
             <fieldset class="form-group2">
                 <legend class="border-bottom mb-4">{{ object.ticketNo }}</legend>
                 <p>Requester: {{ object.requester }}</p>
+                <p>Description: {{ object.description }}</p>
                 <p>Assigned: {{ object.assigned }}</p>
                 {{ form|crispy }}
             </fieldset>

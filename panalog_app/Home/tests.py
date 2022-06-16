@@ -37,7 +37,6 @@ class Testhomeview(TestCase):
 
 class TestTicketCreation(TestCase):
     def test_ticket_creation(self):
-
         ticket1 = Ticket.objects.create(ticketNo = "222-222222")
         self.assertEqual(str(ticket1), "222-222222")
         print("Created Ticket 222-2222222 :", isinstance(ticket1,Ticket))
