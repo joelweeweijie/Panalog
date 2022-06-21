@@ -8,4 +8,10 @@
             <small class="text-muted">Login in again<a class="ml-2" href="{% url 'login' %}">here</a> </small>
         </div>
     </div>
+<script>
+ // timed redierct
+    setTimeout(function(){
+        window.location.href = "{% url 'login' %}";
+    }, 4500);
+</script>
 {% endblock content %}
