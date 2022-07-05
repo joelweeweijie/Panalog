@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
@@ -33,12 +35,13 @@ class PostListView(LoginRequiredMixin, ListView):
 
     model = Ticket
     template_name = 'Home/home.html'
-    context_object_name = 'tix'
+    context_object_name = 'userstickets'
     def get_queryset(self):
         currentUser = (self.request.user.profile.fullname)
         return Ticket.objects.filter(classt="Active").filter(assigned=currentUser).order_by('-date_created')
     ordering = ['-date_created']
     paginate_by = 5
+    extra_context = {'activemnth': Ticket_month_year.objects.filter(Active=True)}
 
 class UserPostListView(LoginRequiredMixin, ListView):
     model = Ticket
@@ -109,11 +112,6 @@ def about(request):
 @manager_only
 def uploadcsv(request):
     month_year_available = Ticket_month_year.objects.all()
-    print("%%%%%%%%")
-    print(month_year_available.values)
-
-    testing1 = Ticket_month_year._meta.get_fields()
-    print(testing1)
 
     context = {
         'title': 'Upload CSV',
@@ -122,51 +120,57 @@ def uploadcsv(request):
 
     if request.method == 'GET':
         return render(request, 'Home/uploadcsv.html', context)
-
-    csv_file = request.FILES['file']
-    # check if its is a csv file
-    if not csv_file.name.endswith('.csv'):
-        messages.error(request, "Not a CSV file")
-    else:
-        data_set = csv_file.read().decode('UTF-8')
-
+    try:
         month_from_model1 = request.POST.get("month_from_model", False)
-        print("Month_from_model")
-        print(month_from_model1)
+        # print("Month_from_model")
+        # print(month_from_model1)
 
         month_selected = request.POST.get("dynamic_month", False)
         year_selected = request.POST.get("dynamic_year", False)
 
         month_from_model = month_selected + "." + year_selected
-        print("month_selected + year_selected")
-        print(month_from_model)
+        # print("month_selected + year_selected")
+        # print(month_from_model)
 
         b = Ticket_month_year(month_year=month_from_model)
         b.save()
 
-        io_string = io.StringIO(data_set)
-        next(io_string) #skips first line in csv "header"
-        for column in csv.reader(io_string, delimiter=',', quotechar='"'):
-            _, created = Ticket.objects.update_or_create(
-                month_year=Ticket_month_year.objects.get(month_year=month_from_model),
-                ticketNo=column[0],
-                type=column[1],
-                team=column[2],
-                customercode=column[3],
-                assigned=column[4],
-                #assigned=column[4] + column[5],
-                mandays=column[5],
-                description=column[6],
-                changereason=column[7],
-                status=column[8],
-                date_created=column[9],
-                date_targetclose=column[10],
-                date_close=column[11],
-                requester=column[12],
-                reasoncode=column[13],
-                classt=column[14]
-            )
-        messages.success(request, 'Successfully uploaded')
+    except Exception as e:
+        messages.error(request, "Release Date Error " + repr(e))
+
+    try:
+        csv_file = request.FILES['file']
+        # check if its is a csv file
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, "Not a CSV file")
+        else:
+            data_set = csv_file.read().decode('UTF-8')
+            io_string = io.StringIO(data_set)
+            next(io_string) #skips first line in csv "header"
+            for column in csv.reader(io_string, delimiter=',', quotechar='"'):
+                _, created = Ticket.objects.update_or_create(
+                    month_year=Ticket_month_year.objects.get(month_year=month_from_model),
+                    ticketNo=column[0],
+                    type=column[1],
+                    team=column[2],
+                    customercode=column[3],
+                    assigned=column[4],
+                    #assigned=column[4] + column[5],
+                    mandays=column[5],
+                    description=column[6],
+                    changereason=column[7],
+                    status=column[8],
+                    date_created=column[9],
+                    date_targetclose=column[10],
+                    date_close=column[11],
+                    requester=column[12],
+                    reasoncode=column[13],
+                    classt=column[14]
+                )
+            messages.success(request, 'Successfully uploaded')
+    except Exception as e:
+        messages.error(request, "Unable to Upload " + repr(e))
+
     return render(request, 'Home/uploadcsv.html', context)
 
 @login_required
@@ -188,9 +192,7 @@ def export(request):
 def hallnonlogger(request):
 
     active_month = Ticket_month_year.objects.filter(Active=True)
-
     name_nonloggers = Ticket.objects.values("assigned").filter(classt="Active").filter(mandays="0").annotate(c1=Count("id")).order_by("-c1")
-
     ticket = Ticket.objects.filter(classt="Active")
 
     #Get the Intersection of Existing Tickets and Existing Users, as there maybe tickets made from other department, or tickets assigned to non existing users.
@@ -229,28 +231,24 @@ def search(request):
 def month(request):
 
     month_year_available = Ticket_month_year.objects.all()
-
     active_month = Ticket.objects.filter(classt="Active")
-
-
     active_month1 = Ticket_month_year.objects.filter(Active=True)
     print(active_month1.values)
     month_selected = ""
     year_selected = ""
 
-
     if request.method == 'POST':
 
         month_from_drop = request.POST.get("month_from_model", False)
-        print("printing the value from drop down")
-        print(month_from_drop)
+        #print("printing the value from drop down")
+        #print(month_from_drop)
         Ticket_month_year.objects.filter(Active=True).update(Active=False)
         setActive = Ticket_month_year.objects.filter(month_year=month_from_drop).update(Active=True)
-        print(setActive)
+        #print(setActive)
         # make all tickets currently active tickets = Inactive
         Ticket.objects.filter(classt="Active").update(classt="Inactive")
         q1 = Ticket.objects.filter(month_year=month_from_drop).update(classt="Active")
-        print(q1)
+        #print(q1)
 
     #new_active_month = month_selected + " " + year_selected
 
@@ -264,12 +262,12 @@ def month(request):
 
 
 def allmember(request):
-    result1 = User.objects.filter(is_staff=False)
+    getmembers = User.objects.filter(is_staff=False)
 
 
     context = {
         'title': 'All Members',
-        'result': result1,
+        'result': getmembers,
     }
     return render(request, 'Home/allmembers.html', context)
 

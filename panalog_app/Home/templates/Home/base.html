@@ -61,7 +61,12 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
                 {% if user.is_authenticated %}
+
+                {% for group in  request.user.groups.all %}
+                        {%  if 'member' == group.name %}
                 <a class="nav-item nav-link" href="{% url 'ticket-create' %}"><i class='fas fa-ticket-alt'></i> NewTicket</a>
+                        {% endif %}
+                {% endfor %}
                 <a class="nav-link font-italic" href="{% url 'profile' %}"><i class='fas fa-address-card'></i> Logged in as [{{user.username}}]</a>
                 <a class="nav-item nav-link" href="{% url 'logout' %}"><i class='fas fa-sign-out-alt'></i> Logout</a>
                 {% else %}

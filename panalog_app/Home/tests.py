@@ -35,12 +35,12 @@ class Testhomeview(TestCase):
         self.assertContains(response, "<h1>Panalog HomePage Welcome!</h1>")
         self.assertEqual(response.status_code, 200)
 
-class TestTicketCreation(TestCase):
-    def test_ticket_creation(self):
-        ticket1 = Ticket.objects.create(ticketNo = "222-222222")
-        self.assertEqual(str(ticket1), "222-222222")
-        print("Created Ticket 222-2222222 :", isinstance(ticket1,Ticket))
-        self.assertTrue(isinstance(ticket1,Ticket))
+# class TestTicketCreation(TestCase):
+#     def test_ticket_creation(self):
+#         ticket1 = Ticket.objects.create(ticketNo = "222-222222")
+#         self.assertEqual(str(ticket1), "222-222222")
+#         print("Created Ticket 222-2222222 :", isinstance(ticket1,Ticket))
+#         self.assertTrue(isinstance(ticket1,Ticket))
 
 class SigninTest(TestCase):
     def setUp(self):

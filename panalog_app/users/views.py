@@ -21,7 +21,7 @@ def register(request):
             user.save()
 
 
-            messages.success(request, f'Account Created, Login Now!')
+            messages.success(request, f'Account Created!')
             return redirect('login')
     else:
         form =UserRegisterForm()
