@@ -24,22 +24,22 @@ tr:nth-child(even) {
         <strong>{{message|safe}}</strong>
     </div>
     {% endfor %}
-    <h1>Upload CSV to Database</h1>
+    <h1>Upload CSV to Database. 2 Step</h1>
 
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        Create Month to Store Tickets :
+        1.Create Month to Store Tickets :
         <select id="dynamic_month" name="dynamic_month"></select>
         <select id="dynamic_year" name="dynamic_year"></select>
         <br>
-        Available Month to Store Tickets :
+        <!--Available Month to Store Tickets :
         <select name="month_from_model" id="month_from_model">
             {% for avail in month_avail %}
             <option value="{{avail.id}}">{{avail.month_year}}</option>
             {% endfor %}
-        </select>
+        </select>-->
         <br>
-        <p>Order of CSV should be </p>
+        <p>2. Upload CSV </p>
         {% load static %}
         <img src="{% static '/csvformat.PNG' %}" alt="My image" width="550">
         <br>

@@ -5,20 +5,27 @@
 <p>Flagged Tickets will Appear Below!</p>
 <br>
 <p>Tickets without an Existing User Assigned</p>
+<form method="post">
+    {% csrf_token %}
 <table>
   <tr>
+    <th></th>
     <th>TicketNo</th>
     <th>Name</th>
       <th>Manage</th>
   </tr>
-{% for q in flagticket %}
+
+    {% for q in flagticket %}
   <tr>
+    <td><input type="checkbox" name="ticketitem" value="{{q.id}}"></td>
      <td>{{q.ticketNo}}</td>
     <td>{{q.assigned}}</td>
     <td>{{q.id}}</td>
       <td><a class="btn btn-outline-danger btn-sm mt-1 mb-1" href="{% url 'ticket-delete' q.id %}">Delete</a></td>
+
   </tr>
 {% endfor %}
 </table>
-
+<h3><input type="submit" name="delete" value="Delete selected"/> </h3>
+  </form>
 {% endblock content %}

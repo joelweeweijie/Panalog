@@ -168,10 +168,71 @@ def uploadcsv(request):
                     classt=column[14]
                 )
             messages.success(request, 'Successfully uploaded')
+            io_string.close()
     except Exception as e:
         messages.error(request, "Unable to Upload " + repr(e))
 
     return render(request, 'Home/uploadcsv.html', context)
+
+@login_required
+@manager_only
+def uploadrawcsv(request):
+    month_year_available = Ticket_month_year.objects.all()
+
+    context = {
+        'title': 'Upload CSV',
+        'month_avail': month_year_available,
+    }
+
+    if request.method == 'GET':
+        return render(request, 'Home/uploadrawcsv.html', context)
+    try:
+        month_from_model1 = request.POST.get("month_from_model", False)
+
+        month_selected = request.POST.get("dynamic_month", False)
+        year_selected = request.POST.get("dynamic_year", False)
+
+        month_from_model = month_selected + "." + year_selected
+
+        b = Ticket_month_year(month_year=month_from_model)
+        b.save()
+
+    except Exception as e:
+        messages.error(request, "Release Date Error " + repr(e))
+
+    try:
+        csv_file = request.FILES['file']
+        # check if its is a csv file
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, "Not a CSV file")
+        else:
+            data_set = csv_file.read().decode('UTF-8')
+            io_string = io.StringIO(data_set)
+            next(io_string) #skips first line in csv "header"
+            for column in csv.reader(io_string, delimiter=',', quotechar='"'):
+                _, created = Ticket.objects.update_or_create(
+                    month_year=Ticket_month_year.objects.get(month_year=month_from_model),
+                    ticketNo=column[0],
+                    type=column[1],
+                    team=column[2],
+                    customercode=column[3],
+                    assigned=column[4],
+                    mandays=column[5],
+                    description=column[6],
+                    changereason=column[7],
+                    status=column[8],
+                    date_created=column[9],
+                    date_targetclose=column[10],
+                    date_close=column[11],
+                    requester=column[12],
+                    reasoncode=column[13],
+                    classt=column[14]
+                )
+            messages.success(request, 'Successfully uploaded')
+    except Exception as e:
+        messages.error(request, "Unable to Upload " + repr(e))
+
+    return render(request, 'Home/uploadrawcsv.html', context)
 
 @login_required
 @manager_only
@@ -287,11 +348,10 @@ def flagtix(request):
     qs = Ticket.objects.filter(assigned__in=qs2)
     qs.update(flag=True)
 
+    if request.POST.get('delete'):
+        q1 = Ticket.objects.filter(id__in=request.POST.getlist('ticketitem'))
+        q1.delete()
 
-    #print("Users")
-    #print(qs)
-
-#ertyjk
     context = {
         'title': 'Flag Ticket',
         'flagticket': qs,

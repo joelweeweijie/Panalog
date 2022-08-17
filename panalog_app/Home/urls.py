@@ -15,6 +15,7 @@ urlpatterns = [
     path('search/', views.search, name='email-search'),
     path('hall/', views.hallnonlogger, name='Pana-hall'),
     path('uploadcsv/', views.uploadcsv, name='Pana-uploadcsv'),
+    path('uploadrawcsv/', views.uploadrawcsv, name='Pana-uploadrawcsv'),
     path('export/', views.export, name='Pana-export'),
     path('actmth/', views.month, name='Pana-actmonth'),
     path('allmem/', views.allmember, name='Pana-allmem'),

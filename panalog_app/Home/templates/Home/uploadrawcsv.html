@@ -1,0 +1,59 @@
+{% extends "Home\base.html" %}
+{% block content %}
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  width: 100px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+
+    {% for message in messages %}
+    <div>
+        <strong>{{message|safe}}</strong>
+    </div>
+    {% endfor %}
+    <h1>Upload RAW CSV to Database</h1>
+<p> Program Should Take columns based on the file being uploaded (Open, Closed, Created)</p>
+
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        Create Month to Store Tickets :
+        <input id="dynamic_month" type="text" name="dynamic_month" value=" ">
+        <input id="dynamic_year" type="text" name="dynamic_year" value=" ">
+       <!-- <select id="dynamic_month" name="dynamic_month"></select>
+        <select id="dynamic_year" name="dynamic_year"></select>-->
+        <br>
+        Available Month to Store Tickets :
+        <select name="month_from_model" id="month_from_model">
+            {% for avail in month_avail %}
+            <option value="{{avail.id}}">{{avail.month_year}}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <p>Order of CSV should be </p>
+        {% load static %}
+        <img src="{% static '/csvformat.PNG' %}" alt="My image" width="550">
+        <br>
+        <br>
+        <label for="file1"> Upload a file</label>
+        <small>Only accepts CSV files</small>
+        <input class="form-control" type="file" id="file1" name="file">
+        <br>
+
+        <button type="submit" class="btn btn-outline-primary">Upload</button>
+    </form>
+
+
+{% endblock content %}
