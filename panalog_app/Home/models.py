@@ -25,9 +25,9 @@ class Ticket(models.Model):
     description = models.TextField(null=True, blank=True,)
     changereason = models.TextField(null=True, blank=True,)
     status = models.CharField(null=True, blank=True, max_length=20) # Active
-    date_created = models.DateField(null=True, blank=True)
-    date_targetclose = models.DateField(null=True, blank=True)
-    date_close = models.DateField(null=True, blank=True)
+    date_created = models.DateField(blank=True, null=True, default='1999-01-01')
+    date_targetclose = models.DateField(blank=True, null=True, default='1999-01-01')
+    date_close = models.DateField(blank=True, null=True, default='1999-01-01')
     requester = models.CharField(null=True, blank=True, max_length=255) # Chen, Wang
     reasoncode = models.CharField(max_length=50, null=True, blank=True) # Awaiting
     classt = models.CharField(null=True, blank=True,max_length=10, default="Inactive")

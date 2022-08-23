@@ -1,8 +1,27 @@
 {% extends "Home\base.html" %}
 {% block content %}
-    <h1>Managers Page</h1>
+    <h1>Combine CSV</h1>
+<br>
+<p>Combine CSV into one Table</p>
 
-<a class="nav-item nav-link" href="{% url 'Pana-uploadcsv' %}">Upload CSV</a>
-<a class="nav-item nav-link" href="{% url 'Pana-actmonth' %}">Active Month</a>
+<form method="post">
+    {% csrf_token %}
+    <table>
+      <tr>
+        <th>CheckBox</th>
+          <th>  </th>
+        <th>CSV File</th>
+      </tr>
+
+        {% for q in avaiable_months %}
+      <tr>
+        <td><input type="checkbox" name="month" value="{{q.id}}"></td>
+          <td>  </td>
+         <td>{{q.month_year}}</td>
+      </tr>
+    {% endfor %}
+    </table>
+    <h3><input type="submit" name="combine" value="Combine selected"/> </h3>
+</form>
 
 {% endblock content %}

@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from .forms import ticketform
 from .decorator import member_only, manager_only
 import json
-
+import pandas as pd
 
 # Create your views here.
 
@@ -178,6 +178,7 @@ def uploadcsv(request):
 @manager_only
 def uploadrawcsv(request):
 
+    int = 0
     #decalre template
     template = "Home/uploadrawcsv.html"
     data = Ticket.objects.all()
@@ -216,10 +217,9 @@ def uploadrawcsv(request):
     data_set = csv_file.read().decode('UTF-8')
     # setup a stream which is when we loop through each line we are able to handle a data in a stream
     io_string = io.StringIO(data_set)
-    next(io_string) #skip first 3 lines
     next(io_string)
-    next(io_string)
-    for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+
+    for column in csv.reader(io_string,  delimiter=',', quotechar='"'):
         _, created = Ticket.objects.update_or_create(
             month_year=Ticket_month_year.objects.get(month_year=month_from_model),
             ticketNo=column[28],
@@ -232,16 +232,74 @@ def uploadrawcsv(request):
             description=column[39],
             changereason=column[40],
             status=column[21],
-            date_created=(column[29].strftime("%d/%m/%Y")),
-            date_targetclose=column[31],
-            date_close=column[33],
+            #date_created = column[29],
+            #date_targetclose=column[31],
+            #date_close=column[33],
             requester=column[9],
             reasoncode=column[24],
             #classt=column[14]
+
         )
+        int = int + 1
+        print(int)
     context = {}
 
     return render(request, template, context)
+
+def pandasupload(request):
+
+    context = {
+        'title': 'PandasUpload',
+    }
+
+    if request.method == "GET":
+        return render(request, 'Home/uploadpandas.html', context)
+
+    try:
+        month_from_model1 = request.POST.get("month_from_model", False)
+        # print("Month_from_model")
+        # print(month_from_model1)
+
+        month_selected = request.POST.get("dynamic_month", False)
+        year_selected = request.POST.get("dynamic_year", False)
+
+        month_from_model = month_selected + "." + year_selected
+        # print("month_selected + year_selected")
+        # print(month_from_model)
+
+        b = Ticket_month_year(month_year=month_from_model)
+        b.save()
+
+    except Exception as e:
+        messages.error(request, "Release Date Error " + repr(e))
+    csv_file = request.FILES['file']
+
+    df = pd.read_csv(csv_file, skiprows=1, sep=',')
+
+    # print(df)
+
+    row_iter = df.iterrows()
+
+    objs = [
+        Ticket(
+            month_year=Ticket_month_year.objects.get(month_year=month_from_model),
+            ticketNo=row[28],
+            type=row[20],
+            customercode=row[10],
+            assigned=row[19],
+            description=row[39],
+            changereason=row[40],
+            status=row[21],
+            date_created=row[29],
+            date_targetclose=row[31],
+            date_close=row[33],
+            requester=row[9],
+            reasoncode=row[24],
+        )
+        for index, row in row_iter
+    ]
+    Ticket.objects.bulk_create(objs)
+    return render(request, 'Home/uploadpandas.html', context)
 
 @login_required
 @manager_only
@@ -366,3 +424,16 @@ def flagtix(request):
         'flagticket': qs,
     }
     return render(request, 'Home/flagtix.html', context)
+
+@login_required
+@manager_only
+def combine(request):
+    month_year_available = Ticket_month_year.objects.all()
+
+    context = {
+        'title': 'CombineCSV',
+        'avaiable_months': month_year_available,
+
+    }
+
+    return render(request, 'Home/manage.html', context)
