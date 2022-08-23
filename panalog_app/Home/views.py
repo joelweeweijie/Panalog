@@ -178,7 +178,6 @@ def uploadcsv(request):
 @manager_only
 def uploadrawcsv(request):
 
-    int = 0
     #decalre template
     template = "Home/uploadrawcsv.html"
     data = Ticket.objects.all()
@@ -240,8 +239,7 @@ def uploadrawcsv(request):
             #classt=column[14]
 
         )
-        int = int + 1
-        print(int)
+
     context = {}
 
     return render(request, template, context)
@@ -274,8 +272,14 @@ def pandasupload(request):
         messages.error(request, "Release Date Error " + repr(e))
     csv_file = request.FILES['file']
 
-    df = pd.read_csv(csv_file, skiprows=1, sep=',')
+    df = pd.read_csv(csv_file, sep=',')
 
+    print(df.columns.tolist())
+    df['Created Date'] = df['Created Date'].fillna('1999-01-01')
+    df['SLA Target Date'] = df['SLA Target Date'].fillna('1999-01-01')
+    #df["Created Date"].fillna("1999-01-01", inplace=True)
+    #df["SLA Target Date"].fillna('1999-01-01', inplace=True)
+    #df["Closed Date"].fillna('1999-01-01', inplace=True)
     # print(df)
 
     row_iter = df.iterrows()
@@ -292,7 +296,7 @@ def pandasupload(request):
             status=row[21],
             date_created=row[29],
             date_targetclose=row[31],
-            date_close=row[33],
+            #date_close=row[33],
             requester=row[9],
             reasoncode=row[24],
         )
