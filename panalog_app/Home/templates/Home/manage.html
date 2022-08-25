@@ -6,22 +6,34 @@
 
 <form method="post">
     {% csrf_token %}
-    <table>
-      <tr>
-        <th>CheckBox</th>
-          <th>  </th>
-        <th>CSV File</th>
-      </tr>
+    Enter a name for the Combined file:
+    <input id="combine_name" type="text" name="combined_name" value="Combine.">
+    <br>
+    Available Month to Store Tickets Open:
+        <select name="month_from_model" id="open">
+            {% for avail in avaiable_months %}
+            <option value="{{avail.id}}">{{avail.month_year}}</option>
+            {% endfor %}
+        </select>
+<br>
 
-        {% for q in avaiable_months %}
-      <tr>
-        <td><input type="checkbox" name="month" value="{{q.id}}"></td>
-          <td>  </td>
-         <td>{{q.month_year}}</td>
-      </tr>
-    {% endfor %}
-    </table>
+Available Month to Store Tickets Create:
+        <select name="month_from_model" id="create">
+            {% for avail in avaiable_months %}
+            <option value="{{avail.id}}">{{avail.month_year}}</option>
+            {% endfor %}
+        </select>
+<br>
+
+Available Month to Store Tickets Close:
+        <select name="month_from_model" id="close">
+            {% for avail in avaiable_months %}
+            <option value="{{avail.id}}">{{avail.month_year}}</option>
+            {% endfor %}
+        </select>
+<br>
     <h3><input type="submit" name="combine" value="Combine selected"/> </h3>
 </form>
+<br>
 
 {% endblock content %}
