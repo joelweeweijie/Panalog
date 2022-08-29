@@ -434,6 +434,49 @@ def flagtix(request):
 def combine(request):
     month_year_available = Ticket_month_year.objects.all()
 
+    if request.method == "POST":
+        final_naming = request.POST.get("combined_name")
+        month_open = request.POST.get("open")
+        month_create = request.POST.get("create")
+        month_close = request.POST.get("close")
+
+        print(final_naming)
+        print(month_open)
+        print(month_create)
+        print(month_close)
+
+        b = Ticket_month_year(month_year=final_naming)
+        b.save()
+
+        #field_names = Ticket._meta.get_fields()
+        #print(field_names)
+        openTicket = Ticket.objects.filter(month_year=month_open)
+        #print(openTicket)
+        #print("=======================")
+        createTicket = Ticket.objects.filter(month_year=month_create)
+        #print(createTicket)
+        #print("=======================")
+        closeTicket = Ticket.objects.filter(month_year=month_close)
+        #print(closeTicket)
+        #print("=======================")
+
+        result = openTicket | createTicket
+        result1 = result | closeTicket
+
+
+        print(result1)
+        print("REMOVE THE # to update the combined tickets HERE!")
+        #result1.update(month_year=final_naming)
+
+        #TEST take only the select fields
+        print("++++++++++++++")
+        selectopentix = Ticket.objects.filter(month_year=month_open).values('ticketNo','assigned', 'mandays')
+        selectcreatetix = Ticket.objects.filter(month_year=month_create).values('ticketNo', 'assigned', 'mandays')
+        selectclosetix = Ticket.objects.filter(month_year=month_close).values('ticketNo', 'assigned', 'mandays')
+        print(selectopentix)
+        print(selectcreatetix)
+        print(selectclosetix)
+
     context = {
         'title': 'CombineCSV',
         'avaiable_months': month_year_available,

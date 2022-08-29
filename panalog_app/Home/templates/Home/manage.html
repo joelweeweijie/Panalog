@@ -10,25 +10,25 @@
     <input id="combine_name" type="text" name="combined_name" value="Combine.">
     <br>
     Available Month to Store Tickets Open:
-        <select name="month_from_model" id="open">
+        <select name="open" id="open">
             {% for avail in avaiable_months %}
-            <option value="{{avail.id}}">{{avail.month_year}}</option>
+            <option value="{{avail.month_year}}">{{avail.month_year}}</option>
             {% endfor %}
         </select>
 <br>
 
 Available Month to Store Tickets Create:
-        <select name="month_from_model" id="create">
+        <select name="close" id="close">
             {% for avail in avaiable_months %}
-            <option value="{{avail.id}}">{{avail.month_year}}</option>
+            <option value="{{avail.month_year}}">{{avail.month_year}}</option>
             {% endfor %}
         </select>
 <br>
 
 Available Month to Store Tickets Close:
-        <select name="month_from_model" id="close">
+        <select name="create" id="create">
             {% for avail in avaiable_months %}
-            <option value="{{avail.id}}">{{avail.month_year}}</option>
+            <option value="{{avail.month_year}}">{{avail.month_year}}</option>
             {% endfor %}
         </select>
 <br>
