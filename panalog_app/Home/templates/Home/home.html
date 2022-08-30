@@ -32,7 +32,6 @@ tr:nth-child(even) {
     <th>TicketID</th>
     <th>Assignee</th>
     <th>Mandays</th>
-    <th>A Mandays</th>
     <th>Description</th>
     <th>Date Created</th>
     <th>Manage</th>
@@ -42,7 +41,6 @@ tr:nth-child(even) {
     <td>{{q.ticketNo}}</td>
     <td>{{q.assigned}}</td>
     <td>{{q.mandays}}</td>
-    <td>{{q.amandays}}</td>
     <td>{{q.description}}</td>
     <td>{{q.date_created}}</td>
     <td><a href="{% url 'ticket-update' q.id %}">Update</a></td>

@@ -29,8 +29,19 @@ tr:nth-child(even) {
 
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+        ABAP CSV file being uploaded? :
+        <select id="abap_selected" name="abap_selected">
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+        </select>
+        <br>
         Create a Name e.g. "OpenAug.2022"/"CreateAug.2022" :
-        <input id="dynamic_month" type="text" name="dynamic_month" value=" ">
+        <select id="dynamic_month" name="dynamic_month">
+            <option value="Open">Open</option>
+            <option value="Create">Create</option>
+            <option value="Close">Close</option>
+        </select>
+        <!--<input id="dynamic_month" type="text" name="dynamic_month" value=" ">-->
         <input id="dynamic_year" type="text" name="dynamic_year" value=" ">
        <!-- <select id="dynamic_month" name="dynamic_month"></select>
         <select id="dynamic_year" name="dynamic_year"></select>-->

@@ -9,7 +9,7 @@
     Enter a name for the Combined file:
     <input id="combine_name" type="text" name="combined_name" value="Combine.">
     <br>
-    Available Month to Store Tickets Open:
+    Available Month to Store Tickets <h3>Open</h3>:
         <select name="open" id="open">
             {% for avail in avaiable_months %}
             <option value="{{avail.month_year}}">{{avail.month_year}}</option>
@@ -17,7 +17,7 @@
         </select>
 <br>
 
-Available Month to Store Tickets Create:
+Available Month to Store Tickets <h3>Create</h3>:
         <select name="close" id="close">
             {% for avail in avaiable_months %}
             <option value="{{avail.month_year}}">{{avail.month_year}}</option>
@@ -25,7 +25,7 @@ Available Month to Store Tickets Create:
         </select>
 <br>
 
-Available Month to Store Tickets Close:
+Available Month to Store Tickets <h3>Close</h3>:
         <select name="create" id="create">
             {% for avail in avaiable_months %}
             <option value="{{avail.month_year}}">{{avail.month_year}}</option>

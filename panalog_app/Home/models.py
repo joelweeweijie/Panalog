@@ -38,3 +38,10 @@ class Ticket(models.Model):
 
     def get_absolute_url(self):
         return reverse('ticket-detail', kwargs={'pk': self.pk})
+
+class Ticket_abap_mandays(models.Model):
+    ticketNo = models.CharField(max_length=20)  # 200-238541
+    amandays = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=1, default='0.00')
+
+    def __str__(self):
+        return self.ticketNo

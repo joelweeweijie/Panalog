@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Ticket, Ticket_month_year
+from .models import Ticket, Ticket_month_year, Ticket_abap_mandays
 from users.models import Profile
 import csv
 import io, datetime
@@ -244,6 +244,8 @@ def uploadrawcsv(request):
 
     return render(request, template, context)
 
+@login_required
+@manager_only
 def pandasupload(request):
 
     context = {
@@ -254,55 +256,69 @@ def pandasupload(request):
         return render(request, 'Home/uploadpandas.html', context)
 
     try:
-        month_from_model1 = request.POST.get("month_from_model", False)
+        isabapcsv = request.POST.get("abap_selected")
         # print("Month_from_model")
         # print(month_from_model1)
+        print(isabapcsv)
 
-        month_selected = request.POST.get("dynamic_month", False)
-        year_selected = request.POST.get("dynamic_year", False)
 
-        month_from_model = month_selected + "." + year_selected
-        # print("month_selected + year_selected")
-        # print(month_from_model)
+        csv_file = request.FILES['file']
 
-        b = Ticket_month_year(month_year=month_from_model)
-        b.save()
+        df = pd.read_csv(csv_file, sep=',')
+        if isabapcsv == "No":
 
+            month_selected = request.POST.get("dynamic_month", False)
+            year_selected = request.POST.get("dynamic_year", False)
+
+            month_from_model = month_selected + "." + year_selected
+            # print("month_selected + year_selected")
+            # print(month_from_model)
+
+            b = Ticket_month_year(month_year=month_from_model)
+            b.save()
+
+            print("Entered isabapvsb = No")
+            df['Created Date'] = df['Created Date'].fillna('1999-01-01')
+            df['SLA Target Date'] = df['SLA Target Date'].fillna('1999-01-01')
+            row_iter = df.iterrows()
+
+            objs = [
+                Ticket(
+                    month_year=Ticket_month_year.objects.get(month_year=month_from_model),
+                    ticketNo=row[28],
+                    type=row[20],
+                    customercode=row[10],
+                    assigned=row[19],
+                    description=row[39],
+                    changereason=row[40],
+                    status=row[21],
+                    date_created=row[29],
+                    date_targetclose=row[31],
+                    # date_close=row[33],
+                    requester=row[9],
+                    reasoncode=row[24],
+                )
+                for index, row in row_iter
+            ]
+            Ticket.objects.bulk_create(objs)
+            messages.success(request, 'Successfully uploaded CSV')
+        elif isabapcsv == "Yes":
+            print("Entered isabapvsb = Yes")
+            row_iter = df.iterrows()
+            objs = [
+                Ticket(
+                    ticketNo=row[0],
+                    amandays=row[6],
+                )
+                for index, row in row_iter
+            ]
+            Ticket_abap_mandays.objects.bulk_create(objs)
+            messages.success(request, 'Successfully uploaded ABAP CSV')
     except Exception as e:
-        messages.error(request, "Release Date Error " + repr(e))
-    csv_file = request.FILES['file']
+        messages.error(request, "Error Name Exists! :" + repr(e))
 
-    df = pd.read_csv(csv_file, sep=',')
 
-    print(df.columns.tolist())
-    df['Created Date'] = df['Created Date'].fillna('1999-01-01')
-    df['SLA Target Date'] = df['SLA Target Date'].fillna('1999-01-01')
-    #df["Created Date"].fillna("1999-01-01", inplace=True)
-    #df["SLA Target Date"].fillna('1999-01-01', inplace=True)
-    #df["Closed Date"].fillna('1999-01-01', inplace=True)
-    # print(df)
 
-    row_iter = df.iterrows()
-
-    objs = [
-        Ticket(
-            month_year=Ticket_month_year.objects.get(month_year=month_from_model),
-            ticketNo=row[28],
-            type=row[20],
-            customercode=row[10],
-            assigned=row[19],
-            description=row[39],
-            changereason=row[40],
-            status=row[21],
-            date_created=row[29],
-            date_targetclose=row[31],
-            #date_close=row[33],
-            requester=row[9],
-            reasoncode=row[24],
-        )
-        for index, row in row_iter
-    ]
-    Ticket.objects.bulk_create(objs)
     return render(request, 'Home/uploadpandas.html', context)
 
 @login_required
@@ -362,7 +378,7 @@ def search(request):
 @manager_only
 def month(request):
 
-    month_year_available = Ticket_month_year.objects.all()
+    month_year_available = Ticket_month_year.objects.all().order_by('-id')
     active_month = Ticket.objects.filter(classt="Active")
     active_month1 = Ticket_month_year.objects.filter(Active=True)
     print(active_month1.values)
@@ -432,7 +448,7 @@ def flagtix(request):
 @login_required
 @manager_only
 def combine(request):
-    month_year_available = Ticket_month_year.objects.all()
+    month_year_available = Ticket_month_year.objects.all().order_by('-id')
 
     if request.method == "POST":
         final_naming = request.POST.get("combined_name")
@@ -440,10 +456,10 @@ def combine(request):
         month_create = request.POST.get("create")
         month_close = request.POST.get("close")
 
-        print(final_naming)
-        print(month_open)
-        print(month_create)
-        print(month_close)
+        #print(final_naming)
+        #print(month_open)
+        #print(month_create)
+        #print(month_close)
 
         b = Ticket_month_year(month_year=final_naming)
         b.save()
@@ -464,18 +480,18 @@ def combine(request):
         result1 = result | closeTicket
 
 
-        print(result1)
-        print("REMOVE THE # to update the combined tickets HERE!")
-        #result1.update(month_year=final_naming)
+        #print(result1)
+        #print("REMOVE THE # to update the combined tickets HERE!")
+        result1.update(month_year=final_naming)
 
         #TEST take only the select fields
-        print("++++++++++++++")
-        selectopentix = Ticket.objects.filter(month_year=month_open).values('ticketNo','assigned', 'mandays')
-        selectcreatetix = Ticket.objects.filter(month_year=month_create).values('ticketNo', 'assigned', 'mandays')
-        selectclosetix = Ticket.objects.filter(month_year=month_close).values('ticketNo', 'assigned', 'mandays')
-        print(selectopentix)
-        print(selectcreatetix)
-        print(selectclosetix)
+        #print("++++++++++++++")
+        #selectopentix = Ticket.objects.filter(month_year=month_open).values('ticketNo','assigned', 'mandays')
+        #selectcreatetix = Ticket.objects.filter(month_year=month_create).values('ticketNo', 'assigned', 'mandays')
+        #selectclosetix = Ticket.objects.filter(month_year=month_close).values('ticketNo', 'assigned', 'mandays')
+        #print(selectopentix)
+        #print(selectcreatetix)
+        #print(selectclosetix)
 
     context = {
         'title': 'CombineCSV',
