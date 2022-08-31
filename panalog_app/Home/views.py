@@ -415,58 +415,27 @@ def combine(request):
         month_create = request.POST.get("create")
         month_close = request.POST.get("close")
 
-        removemonths = month_open + ", " + month_create + ", " + month_close
-        #print(final_naming)
-        #print(month_open)
-        #print(month_create)
-        #print(month_close)
-
         b = Ticket_month_year(month_year=final_naming)
         b.save()
 
-        #field_names = Ticket._meta.get_fields()
-        #print(field_names)
+        #Get the tickets based on the foreignkey
         openTicket = Ticket.objects.filter(month_year=month_open)
-        #print(openTicket)
-        #print("=======================")
         createTicket = Ticket.objects.filter(month_year=month_create)
-        #print(createTicket)
-        #print("=======================")
         closeTicket = Ticket.objects.filter(month_year=month_close)
-        #print(closeTicket)
-        #print("=======================")
-
+        #Uninon of the tickets into one COMBINED
         OpennClose = openTicket | createTicket
         combined = OpennClose | closeTicket
 
         df1 = pd.DataFrame(Ticket.objects.filter(month_year=month_open).values())
         df2 = pd.DataFrame(Ticket.objects.filter(month_year=month_create).values())
         df3 = pd.DataFrame(Ticket.objects.filter(month_year=month_close).values())
-        #print("After setting df1, df2, df3")
-        #print(df1.columns)
-
-        #print("@@@@@@@@@@@@@@@@@@@@ OPEN")
-        #print(df1)
-        #print("@@@@@@@@@@@@@@@@@@@@ CREATE")
-        #print(df2)
-        #print("@@@@@@@@@@@@@@@@@@@@ CLOSE")
-        #print(df3)
-        #print("%%%%%%%%%%%%%%%%%%%% MERGE FOR DF1, DF2")
 
         df1df2 = pd.concat([df1, df2]).drop_duplicates('ticketNo')
-
         dup1 = pd.merge(df1, df2, how="right", on=["ticketNo"])
-        #print(dup1)
-        #print("******************** DF3 included")
-
         dup2 = pd.merge(df1df2, df3, how="right", on=["ticketNo"])
-        #print(dup2)
-        #print("++++++++++++++FINALRESULTS+++++++++++")
-
         dup3 = pd.concat([dup1, dup2])
         dup4 = dup3 ['id_x'].dropna().astype(int).tolist()
-        #print(dup4)
-        #DELETE THE DUPLICATE TICKETS
+        #DELETE the Duplicates based on the ticket_id
         query1 = Ticket.objects.filter(id__in=dup4)
         #print(query1)
         query1.delete()
@@ -476,9 +445,9 @@ def combine(request):
         remove = Ticket_month_year.objects.filter(month_year=month_open)
         remove2 = Ticket_month_year.objects.filter(month_year=month_create)
         remove3 = Ticket_month_year.objects.filter(month_year=month_close)
-        print(remove)
-        print(remove2)
-        print(remove3)
+        #print(remove)
+        #print(remove2)
+        #print(remove3)
         remove.delete()
         remove2.delete()
         remove3.delete()
