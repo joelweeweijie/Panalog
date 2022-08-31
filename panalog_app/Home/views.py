@@ -181,23 +181,11 @@ def uploadrawcsv(request):
     #decalre template
     template = "Home/uploadrawcsv.html"
     month_avail = Ticket_month_year.objects.all()
-    # prompt is a context variable that can have different values      depending on their context
-    prompt = {
-        'order': 'Order of the CSV should be ####',
-        'month_avail': month_avail
-    }
 
     if request.POST.get('delete'):
         selected = request.POST.get("month_from_model")
-        print("$$$$$$$$$$$$$$$")
-        print(selected)
-
         Ticket.objects.filter(month_year=selected).delete()
         Ticket_month_year.objects.filter(month_year=selected).delete()
-
-        #q2 = Ticket_month_year.objects.filter(id__in=request.POST.get())
-        #q1 = Ticket.objects.filter(month_year=selected)
-        #q1.delete()
 
     context = {
         'month_avail': month_avail
@@ -220,7 +208,7 @@ def pandasupload(request):
         isabapcsv = request.POST.get("abap_selected")
         # print("Month_from_model")
         # print(month_from_model1)
-        print(isabapcsv)
+        #print(isabapcsv)
 
 
         csv_file = request.FILES['file']
@@ -238,7 +226,7 @@ def pandasupload(request):
             b = Ticket_month_year(month_year=month_from_model)
             b.save()
 
-            print("Entered isabapvsb = No")
+            #print("Entered isabapvsb = No")
             df['Created Date'] = df['Created Date'].fillna('1999-01-01')
             df['SLA Target Date'] = df['SLA Target Date'].fillna('1999-01-01')
             row_iter = df.iterrows()
@@ -264,7 +252,7 @@ def pandasupload(request):
             Ticket.objects.bulk_create(objs)
             messages.success(request, 'Successfully uploaded CSV')
         elif isabapcsv == "Yes":
-            print("Entered isabapvsb = Yes")
+            #print("Entered isabapvsb = Yes")
             row_iter = df.iterrows()
             objs = [
                 Ticket(
@@ -427,6 +415,7 @@ def combine(request):
         month_create = request.POST.get("create")
         month_close = request.POST.get("close")
 
+        removemonths = month_open + ", " + month_create + ", " + month_close
         #print(final_naming)
         #print(month_open)
         #print(month_create)
@@ -453,37 +442,46 @@ def combine(request):
         df1 = pd.DataFrame(Ticket.objects.filter(month_year=month_open).values())
         df2 = pd.DataFrame(Ticket.objects.filter(month_year=month_create).values())
         df3 = pd.DataFrame(Ticket.objects.filter(month_year=month_close).values())
-        print("After setting df1, df2, df3")
+        #print("After setting df1, df2, df3")
         #print(df1.columns)
 
-        print("@@@@@@@@@@@@@@@@@@@@ OPEN")
-        print(df1)
-        print("@@@@@@@@@@@@@@@@@@@@ CREATE")
-        print(df2)
-        print("@@@@@@@@@@@@@@@@@@@@ CLOSE")
-        print(df3)
-        print("%%%%%%%%%%%%%%%%%%%% MERGE FOR DF1, DF2")
+        #print("@@@@@@@@@@@@@@@@@@@@ OPEN")
+        #print(df1)
+        #print("@@@@@@@@@@@@@@@@@@@@ CREATE")
+        #print(df2)
+        #print("@@@@@@@@@@@@@@@@@@@@ CLOSE")
+        #print(df3)
+        #print("%%%%%%%%%%%%%%%%%%%% MERGE FOR DF1, DF2")
 
         df1df2 = pd.concat([df1, df2]).drop_duplicates('ticketNo')
 
         dup1 = pd.merge(df1, df2, how="right", on=["ticketNo"])
-        print(dup1)
-        print("******************** DF3 included")
+        #print(dup1)
+        #print("******************** DF3 included")
 
         dup2 = pd.merge(df1df2, df3, how="right", on=["ticketNo"])
-        print(dup2)
-        print("++++++++++++++FINALRESULTS+++++++++++")
+        #print(dup2)
+        #print("++++++++++++++FINALRESULTS+++++++++++")
 
         dup3 = pd.concat([dup1, dup2])
         dup4 = dup3 ['id_x'].dropna().astype(int).tolist()
-        print(dup4)
+        #print(dup4)
         #DELETE THE DUPLICATE TICKETS
         query1 = Ticket.objects.filter(id__in=dup4)
-        print(query1)
+        #print(query1)
         query1.delete()
         #COMBINE THE 3 Files and SAVE/UPDATE
         combined.update(month_year=final_naming)
 
+        remove = Ticket_month_year.objects.filter(month_year=month_open)
+        remove2 = Ticket_month_year.objects.filter(month_year=month_create)
+        remove3 = Ticket_month_year.objects.filter(month_year=month_close)
+        print(remove)
+        print(remove2)
+        print(remove3)
+        remove.delete()
+        remove2.delete()
+        remove3.delete()
 
 
     context = {
