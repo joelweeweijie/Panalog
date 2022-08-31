@@ -16,8 +16,14 @@
             {% endfor %}
         </select>
 <br>
-
 Available Month to Store Tickets <h3>Create</h3>:
+        <select name="create" id="create">
+            {% for avail in avaiable_months %}
+            <option value="{{avail.month_year}}">{{avail.month_year}}</option>
+            {% endfor %}
+        </select>
+<br>
+Available Month to Store Tickets <h3>Close</h3>:
         <select name="close" id="close">
             {% for avail in avaiable_months %}
             <option value="{{avail.month_year}}">{{avail.month_year}}</option>
@@ -25,13 +31,7 @@ Available Month to Store Tickets <h3>Create</h3>:
         </select>
 <br>
 
-Available Month to Store Tickets <h3>Close</h3>:
-        <select name="create" id="create">
-            {% for avail in avaiable_months %}
-            <option value="{{avail.month_year}}">{{avail.month_year}}</option>
-            {% endfor %}
-        </select>
-<br>
+
     <h3><input type="submit" name="combine" value="Combine selected"/> </h3>
 </form>
 <br>

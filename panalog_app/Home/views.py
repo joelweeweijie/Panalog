@@ -180,67 +180,28 @@ def uploadrawcsv(request):
 
     #decalre template
     template = "Home/uploadrawcsv.html"
-    data = Ticket.objects.all()
+    month_avail = Ticket_month_year.objects.all()
     # prompt is a context variable that can have different values      depending on their context
     prompt = {
         'order': 'Order of the CSV should be ####',
-        'ticket': data
+        'month_avail': month_avail
     }
-    # GET request returns the value of the data with the specified key.
-    if request.method == "GET":
-        return render(request, template, prompt)
 
-    try:
-        month_from_model1 = request.POST.get("month_from_model", False)
-        # print("Month_from_model")
-        # print(month_from_model1)
+    if request.POST.get('delete'):
+        selected = request.POST.get("month_from_model")
+        print("$$$$$$$$$$$$$$$")
+        print(selected)
 
-        month_selected = request.POST.get("dynamic_month", False)
-        year_selected = request.POST.get("dynamic_year", False)
+        Ticket.objects.filter(month_year=selected).delete()
+        Ticket_month_year.objects.filter(month_year=selected).delete()
 
-        month_from_model = month_selected + "." + year_selected
-        # print("month_selected + year_selected")
-        # print(month_from_model)
+        #q2 = Ticket_month_year.objects.filter(id__in=request.POST.get())
+        #q1 = Ticket.objects.filter(month_year=selected)
+        #q1.delete()
 
-        b = Ticket_month_year(month_year=month_from_model)
-        b.save()
-
-    except Exception as e:
-        messages.error(request, "Release Date Error " + repr(e))
-
-    csv_file = request.FILES['file']
-    # let's check if it is a csv file
-    if not csv_file.name.endswith('.csv'):
-        messages.error(request, 'THIS IS NOT A CSV FILE')
-
-    data_set = csv_file.read().decode('UTF-8')
-    # setup a stream which is when we loop through each line we are able to handle a data in a stream
-    io_string = io.StringIO(data_set)
-    next(io_string)
-
-    for column in csv.reader(io_string,  delimiter=',', quotechar='"'):
-        _, created = Ticket.objects.update_or_create(
-            month_year=Ticket_month_year.objects.get(month_year=month_from_model),
-            ticketNo=column[28],
-            type=column[20],
-            #team=column[2],
-            customercode=column[10],
-            assigned=column[19],
-            # assigned=column[4] + column[5],
-            #mandays=column[],
-            description=column[39],
-            changereason=column[40],
-            status=column[21],
-            #date_created = column[29],
-            #date_targetclose=column[31],
-            #date_close=column[33],
-            requester=column[9],
-            reasoncode=column[24],
-            #classt=column[14]
-
-        )
-
-    context = {}
+    context = {
+        'month_avail': month_avail
+    }
 
     return render(request, template, context)
 
@@ -439,6 +400,16 @@ def flagtix(request):
         q1 = Ticket.objects.filter(id__in=request.POST.getlist('ticketitem'))
         q1.delete()
 
+
+    #FINDING DUPLICATE TICKETS BASED ON THE "ticketNo"
+    #dupes = Ticket.objects.values('ticketNo').annotate(Count('id')).order_by().filter(id__count__gt=1)
+
+    #result1 = Ticket.objects.filter(ticketNo__in=[item['ticketNo'] for item in dupes])
+
+    #print(result1)
+
+
+
     context = {
         'title': 'Flag Ticket',
         'flagticket': qs,
@@ -476,22 +447,44 @@ def combine(request):
         #print(closeTicket)
         #print("=======================")
 
-        result = openTicket | createTicket
-        result1 = result | closeTicket
+        OpennClose = openTicket | createTicket
+        combined = OpennClose | closeTicket
+
+        df1 = pd.DataFrame(Ticket.objects.filter(month_year=month_open).values())
+        df2 = pd.DataFrame(Ticket.objects.filter(month_year=month_create).values())
+        df3 = pd.DataFrame(Ticket.objects.filter(month_year=month_close).values())
+        print("After setting df1, df2, df3")
+        #print(df1.columns)
+
+        print("@@@@@@@@@@@@@@@@@@@@ OPEN")
+        print(df1)
+        print("@@@@@@@@@@@@@@@@@@@@ CREATE")
+        print(df2)
+        print("@@@@@@@@@@@@@@@@@@@@ CLOSE")
+        print(df3)
+        print("%%%%%%%%%%%%%%%%%%%% MERGE FOR DF1, DF2")
+
+        df1df2 = pd.concat([df1, df2]).drop_duplicates('ticketNo')
+
+        dup1 = pd.merge(df1, df2, how="right", on=["ticketNo"])
+        print(dup1)
+        print("******************** DF3 included")
+
+        dup2 = pd.merge(df1df2, df3, how="right", on=["ticketNo"])
+        print(dup2)
+        print("++++++++++++++FINALRESULTS+++++++++++")
+
+        dup3 = pd.concat([dup1, dup2])
+        dup4 = dup3 ['id_x'].dropna().astype(int).tolist()
+        print(dup4)
+        #DELETE THE DUPLICATE TICKETS
+        query1 = Ticket.objects.filter(id__in=dup4)
+        print(query1)
+        query1.delete()
+        #COMBINE THE 3 Files and SAVE/UPDATE
+        combined.update(month_year=final_naming)
 
 
-        #print(result1)
-        #print("REMOVE THE # to update the combined tickets HERE!")
-        result1.update(month_year=final_naming)
-
-        #TEST take only the select fields
-        #print("++++++++++++++")
-        #selectopentix = Ticket.objects.filter(month_year=month_open).values('ticketNo','assigned', 'mandays')
-        #selectcreatetix = Ticket.objects.filter(month_year=month_create).values('ticketNo', 'assigned', 'mandays')
-        #selectclosetix = Ticket.objects.filter(month_year=month_close).values('ticketNo', 'assigned', 'mandays')
-        #print(selectopentix)
-        #print(selectcreatetix)
-        #print(selectclosetix)
 
     context = {
         'title': 'CombineCSV',
