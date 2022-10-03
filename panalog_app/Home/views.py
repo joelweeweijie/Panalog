@@ -206,11 +206,6 @@ def pandasupload(request):
 
     try:
         isabapcsv = request.POST.get("abap_selected")
-        # print("Month_from_model")
-        # print(month_from_model1)
-        #print(isabapcsv)
-
-
         csv_file = request.FILES['file']
 
         df = pd.read_csv(csv_file, sep=',')
@@ -220,13 +215,10 @@ def pandasupload(request):
             year_selected = request.POST.get("dynamic_year", False)
 
             month_from_model = month_selected + "." + year_selected
-            # print("month_selected + year_selected")
-            # print(month_from_model)
-
             b = Ticket_month_year(month_year=month_from_model)
             b.save()
 
-            #print("Entered isabapvsb = No")
+            #Dataframe conditions if cell is EMPTY
             df['Created Date'] = df['Created Date'].fillna('1999-01-01')
             df['SLA Target Date'] = df['SLA Target Date'].fillna('1999-01-01')
             row_iter = df.iterrows()
@@ -252,7 +244,6 @@ def pandasupload(request):
             Ticket.objects.bulk_create(objs)
             messages.success(request, 'Successfully uploaded CSV')
         elif isabapcsv == "Yes":
-            #print("Entered isabapvsb = Yes")
             row_iter = df.iterrows()
             objs = [
                 Ticket(
@@ -374,12 +365,7 @@ def flagtix(request):
 
     trueTickets = Ticket.objects.all().filter(classt="Active").values("assigned")
     trueUsers = Profile.objects.values("fullname")
-    #trueUsers2 = User.objects.all().values("first_name", "last_name")
-    #print(trueTickets)
-    #print(trueUsers)
     qs2 = trueTickets.difference(trueUsers)
-    #print("Abnormal User Found")
-    #print(qs2)
 
     qs = Ticket.objects.filter(assigned__in=qs2)
     qs.update(flag=True)
@@ -388,16 +374,12 @@ def flagtix(request):
         q1 = Ticket.objects.filter(id__in=request.POST.getlist('ticketitem'))
         q1.delete()
 
-
     #FINDING DUPLICATE TICKETS BASED ON THE "ticketNo"
     #dupes = Ticket.objects.values('ticketNo').annotate(Count('id')).order_by().filter(id__count__gt=1)
 
     #result1 = Ticket.objects.filter(ticketNo__in=[item['ticketNo'] for item in dupes])
 
     #print(result1)
-
-
-
     context = {
         'title': 'Flag Ticket',
         'flagticket': qs,
@@ -431,10 +413,20 @@ def combine(request):
         df3 = pd.DataFrame(Ticket.objects.filter(month_year=month_close).values())
 
         df1df2 = pd.concat([df1, df2]).drop_duplicates('ticketNo')
-        dup1 = pd.merge(df1, df2, how="right", on=["ticketNo"])
-        dup2 = pd.merge(df1df2, df3, how="right", on=["ticketNo"])
+        print("++++++++++++++++++++Df1df2++++++++++++++++++++++")
+        print(df1df2)
+        dup1 = pd.merge(df2, df1, how="right", on=["ticketNo"])
+        print("++++++++++++++++++++DUP1++++++++++++++++++++++")
+        print(dup1)
+        dup2 = pd.merge(df3, df1df2, how="right", on=["ticketNo"])
+        print("++++++++++++++++++++DUP2++++++++++++++++++++++")
+        print(dup2)
         dup3 = pd.concat([dup1, dup2])
+        print("++++++++++++++++++++DUP3++++++++++++++++++++++")
+        print(dup3)
         dup4 = dup3 ['id_x'].dropna().astype(int).tolist()
+        print("++++++++++++++++++++DUP4++++++++++++++++++++++")
+        print(dup4)
         #DELETE the Duplicates based on the ticket_id
         query1 = Ticket.objects.filter(id__in=dup4)
         #print(query1)
@@ -445,12 +437,12 @@ def combine(request):
         remove = Ticket_month_year.objects.filter(month_year=month_open)
         remove2 = Ticket_month_year.objects.filter(month_year=month_create)
         remove3 = Ticket_month_year.objects.filter(month_year=month_close)
-        #print(remove)
-        #print(remove2)
-        #print(remove3)
+
         remove.delete()
         remove2.delete()
         remove3.delete()
+
+        messages.success(request, 'Successfully Combined')
 
 
     context = {

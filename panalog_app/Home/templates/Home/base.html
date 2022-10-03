@@ -41,16 +41,15 @@
                 <li class="nav-item dropdown">
                          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class='fas fa-balance-scale'></i> Manager</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{% url 'Pana-actmonth' %}"><i class='fas fa-chalkboard-teacher'></i> Active Month</a>
+                                <a class="dropdown-item" href="{% url 'Pana-pandas' %}"><i class='fas fa-file-csv'></i> Upload CSV</a>
                               <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{% url 'Pana-combine' %}"><i class="fa fa-tasks"></i> Combine</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'Pana-uploadrawcsv' %}"><i class="fa fa-tasks"></i> Delete File</a>
-                                <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="{% url 'Pana-flagtix' %}"><i class='far fa-flag'></i> Flag Ticket</a>
+                              <a class="dropdown-item" href="{% url 'Pana-actmonth' %}"><i class='fas fa-chalkboard-teacher'></i> Active Month</a>
                                  <div class="dropdown-divider"></div>
-                              <a class="dropdown-item" href="{% url 'Pana-pandas' %}"><i class='fas fa-file-csv'></i> Manage CSV</a>
-
+                                <a class="dropdown-item" href="{% url 'Pana-flagtix' %}"><i class='far fa-flag'></i> Flag Ticket</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'Pana-uploadrawcsv' %}"><i class="fa fa-tasks"></i> Delete File</a>
                             </div>
                 </li>
                         {% endif %}
